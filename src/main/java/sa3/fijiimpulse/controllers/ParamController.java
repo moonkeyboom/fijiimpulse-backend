@@ -9,10 +9,11 @@ public class ParamController {
 
     @GetMapping("/testparam")
     public String mappingTest(
-            @RequestParam(name = "name") String inputParam
+            @RequestParam(name = "name", required = false) String inputParam,
+            @RequestParam(name = "age", required = false) Integer inputAge
             ) {
-        System.out.println("input form query: " + inputParam);
-        return "mappingTest";
+//        System.out.println("input form query: " + inputParam);
+        return String.format("name = %s, age = %d", inputParam, inputAge);
     }
 
 }
