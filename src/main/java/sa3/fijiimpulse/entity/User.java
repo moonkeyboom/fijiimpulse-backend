@@ -2,6 +2,8 @@ package sa3.fijiimpulse.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name="user")
 public class User {
@@ -22,6 +24,9 @@ public class User {
     @Column(name="Password")
     private String password;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders;
+
     public User() {}
 
     public User(String username, String email, String password, String role) {
@@ -30,6 +35,7 @@ public class User {
         this.password = password;
         this.role = role;
     }
+
 
     public int getUserId() {
         return userId;
@@ -71,14 +77,11 @@ public class User {
         this.role = role;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", role='" + role + '\'' +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }
