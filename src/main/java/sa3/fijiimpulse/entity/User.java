@@ -1,87 +1,33 @@
 package sa3.fijiimpulse.entity;
 
-import jakarta.persistence.*;
-
-import java.util.List;
-
-@Entity
-@Table(name="user")
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="User_Id")
-    private int userId;
-
-    @Column(name="Role")
+    private Long userId;
+    private String username;
+    private String email;
+    private String password;
     private String role;
 
-    @Column(name="Username")
-    private String username;
-
-    @Column(name="Email")
-    private String email;
-
-    @Column(name="Password")
-    private String password;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Order> orders;
-
-    public User() {}
-
-    public User(String username, String email, String password, String role) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
+    public User(Long userId, String username, String email, String password, String role) {
         this.userId = userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
         this.role = role;
     }
 
-    public List<Order> getOrders() {
-        return orders;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }
+

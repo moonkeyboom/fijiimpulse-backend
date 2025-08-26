@@ -1,106 +1,47 @@
 package sa3.fijiimpulse.entity;
 
-import jakarta.persistence.Embeddable;
 
-@Embeddable
 public class Address {
     private String recipientName;
-    private String phoneNumber;
-    private String district;
-    private String houseAdress;
-    private String subDistrict;
+    private String houseAddress;
     private String streetName;
+    private String subDistrict;
+    private String district;
     private String province;
     private String postalCode;
 
     public Address() {}
 
-    public Address(String recipientName, String phoneNumber, String district, String houseAdress, String subDistrict, String streetName, String province, String postalCode) {
+    public Address(String recipientName, String houseAddress, String streetName, String subDistrict,
+                   String district, String province, String postalCode) {
         this.recipientName = recipientName;
-        this.phoneNumber = phoneNumber;
-        this.district = district;
-        this.houseAdress = houseAdress;
-        this.subDistrict = subDistrict;
+        this.houseAddress = houseAddress;
         this.streetName = streetName;
+        this.subDistrict = subDistrict;
+        this.district = district;
         this.province = province;
         this.postalCode = postalCode;
     }
 
-    public String getRecipientName() {
-        return recipientName;
-    }
+    // getters & setters
+    public String getRecipientName() { return recipientName; }
+    public void setRecipientName(String recipientName) { this.recipientName = recipientName; }
 
-    public void setRecipientName(String recipientName) {
-        this.recipientName = recipientName;
-    }
+    public String getHouseAddress() { return houseAddress; }
+    public void setHouseAddress(String houseAddress) { this.houseAddress = houseAddress; }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+    public String getStreetName() { return streetName; }
+    public void setStreetName(String streetName) { this.streetName = streetName; }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+    public String getSubDistrict() { return subDistrict; }
+    public void setSubDistrict(String subDistrict) { this.subDistrict = subDistrict; }
 
-    public String getDistrict() {
-        return district;
-    }
+    public String getDistrict() { return district; }
+    public void setDistrict(String district) { this.district = district; }
 
-    public void setDistrict(String district) {
-        this.district = district;
-    }
+    public String getProvince() { return province; }
+    public void setProvince(String province) { this.province = province; }
 
-    public String getHouseAdress() {
-        return houseAdress;
-    }
-
-    public void setHouseAdress(String houseAdress) {
-        this.houseAdress = houseAdress;
-    }
-
-    public String getSubDistrict() {
-        return subDistrict;
-    }
-
-    public void setSubDistrict(String subDistrict) {
-        this.subDistrict = subDistrict;
-    }
-
-    public String getStreetName() {
-        return streetName;
-    }
-
-    public void setStreetName(String streetName) {
-        this.streetName = streetName;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public void setProvince(String province) {
-        this.province = province;
-    }
-
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
-
-    @Override
-    public String toString() {
-        return "Address{" +
-                "recipientName='" + recipientName + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", district='" + district + '\'' +
-                ", houseAdress='" + houseAdress + '\'' +
-                ", subDistrict='" + subDistrict + '\'' +
-                ", streetName='" + streetName + '\'' +
-                ", province='" + province + '\'' +
-                ", postalCode='" + postalCode + '\'' +
-                '}';
-    }
+    public String getPostalCode() { return postalCode; }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
 }

@@ -4,49 +4,55 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import sa3.fijiimpulse.entity.User;
 
 import java.util.List;
 
+
 @Repository
-public class UserRepository implements UserDAO{
-    private EntityManager entityManager;
+public class UserRepository {
+    private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public UserRepository(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public UserRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Override
-    @Transactional
-    public void save(User user) {
-        entityManager.persist(user);
+    public int save(User user) {
+        String sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
+        return jdbcTemplate.update(sql, user.getUsername(), user.getEmail(), user.getPassword(), user.getRole());
     }
 
-    @Override
-    @Transactional
-    public void delete(Integer userId) {
-        User user = entityManager.find(User.class, userId);
-        entityManager.remove(user);
+    public int update(User user) {
+        String sql = "UPDATE users SET username=?, email=?, password=?, role=? WHERE user_id=?";
+        return jdbcTemplate.update(sql, user.getUsername(), user.getEmail(), user.getPassword(), user.getRole(), user.getUserId());
     }
 
-    @Override
-    public User getUserById(Integer userId) {
-        return entityManager.find(User.class, userId);
+    public int delete(Long userId) {
+        String sql = "DELETE FROM users WHERE user_id=?";
+        return jdbcTemplate.update(sql, userId);
     }
 
-    @Override
-    public List<User> getAllUsers() {
-        TypedQuery<User> query = entityManager.createQuery("FROM User", User.class);
-        return query.getResultList();
+    public User findById(Long userId) {
+        String sql = "SELECT * FROM users WHERE user_id=?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new User(
+                rs.getLong("user_id"),
+                rs.getString("username"),
+                rs.getString("email"),
+                rs.getString("password"),
+                rs.getString("role")
+        ), userId);
     }
 
-    @Override
-    @Transactional
-    public void updateUser(User user) {
-        entityManager.merge(user);
+    public List<User> findAll() {
+        String sql = "SELECT * FROM users";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new User(
+                rs.getLong("user_id"),
+                rs.getString("username"),
+                rs.getString("email"),
+                rs.getString("password"),
+                rs.getString("role")
+        ));
     }
-
-
 }
