@@ -11,20 +11,27 @@ import java.util.List;
 public class RecipeMaterialController {
     private final RecipeMaterialService service;
 
-    public RecipeMaterialController(RecipeMaterialService service) { this.service = service; }
+    public RecipeMaterialController(RecipeMaterialService service) {
+        this.service = service;
+    }
 
     @PostMapping
-    public String create(@RequestBody RecipeMaterial rm) { service.create(rm); return "Created"; }
+    public String create(@RequestBody RecipeMaterial rm) {
+        service.create(rm); return "Created";
+    }
 
     @PutMapping("/{recipeId}/{materialId}")
     public String update(@PathVariable Long recipeId, @PathVariable Long materialId, @RequestBody RecipeMaterial rm) {
-        rm.setRecipeId(recipeId); rm.setMaterialId(materialId);
-        service.update(rm); return "Updated";
+        rm.setRecipeId(recipeId);
+        rm.setMaterialId(materialId);
+        service.update(rm);
+        return "Updated";
     }
 
     @DeleteMapping("/{recipeId}/{materialId}")
     public String delete(@PathVariable Long recipeId, @PathVariable Long materialId) {
-        service.delete(recipeId, materialId); return "Deleted";
+        service.delete(recipeId, materialId);
+        return "Deleted";
     }
 
     @GetMapping("/{recipeId}/{materialId}")
@@ -33,5 +40,7 @@ public class RecipeMaterialController {
     }
 
     @GetMapping
-    public List<RecipeMaterial> getAll() { return service.getAll(); }
+    public List<RecipeMaterial> getAll() {
+        return service.getAll();
+    }
 }

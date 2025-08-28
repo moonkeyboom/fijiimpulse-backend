@@ -11,20 +11,26 @@ import java.util.List;
 public class OrderDetailController {
     private final OrderDetailService service;
 
-    public OrderDetailController(OrderDetailService service) { this.service = service; }
+    public OrderDetailController(OrderDetailService service) {
+        this.service = service;
+    }
 
     @PostMapping
-    public String create(@RequestBody OrderDetail od) { service.create(od); return "OrderDetail created"; }
+    public String create(@RequestBody OrderDetail od) {
+        service.create(od); return "OrderDetail created";
+    }
 
     @PutMapping("/{orderId}/{serialNo}")
     public String update(@PathVariable Long orderId, @PathVariable String serialNo, @RequestBody OrderDetail od) {
-        od.setOrderId(orderId); od.setSerialNo(serialNo);
+        od.setOrderId(orderId);
+        od.setSerialNo(serialNo);
         service.update(od); return "OrderDetail updated";
     }
 
     @DeleteMapping("/{orderId}/{serialNo}")
     public String delete(@PathVariable Long orderId, @PathVariable String serialNo) {
-        service.delete(orderId, serialNo); return "OrderDetail deleted";
+        service.delete(orderId, serialNo);
+        return "OrderDetail deleted";
     }
 
     @GetMapping("/{orderId}/{serialNo}")
@@ -33,5 +39,7 @@ public class OrderDetailController {
     }
 
     @GetMapping
-    public List<OrderDetail> getAll() { return service.getAll(); }
+    public List<OrderDetail> getAll() {
+        return service.getAll();
+    }
 }
