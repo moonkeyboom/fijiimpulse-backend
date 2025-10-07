@@ -111,4 +111,30 @@ public class OrderDAO {
         ));
     }
 
+    // Use Case 2M: ดึงคำสั่งซื้อตามสถานะ (เช่น "รอตรวจสอบหลักฐานการชำระเงิน")
+    public List<Order> findByOrderStatus(String status) {
+        String sql = "SELECT * FROM ORDERS WHERE Order_status=?";
+        return jdbcTemplate.query(sql, new Object[]{status}, (rs, rowNum) -> new Order(
+                rs.getLong("Order_id"),
+                rs.getInt("User_id"),
+                rs.getString("Order_status"),
+                rs.getString("Recipient_name"),
+                rs.getString("Phone_number"),
+                rs.getString("District"),
+                rs.getString("House_address"),
+                rs.getString("Sub_district"),
+                rs.getString("Street_name"),
+                rs.getString("Province"),
+                rs.getString("Postal_code"),
+                rs.getTimestamp("Order_date"),
+                rs.getBigDecimal("Grand_total_price")
+        ));
+    }
+
+    // Use Case 2M: อัปเดตสถานะคำสั่งซื้อ
+    public int updateOrderStatus(long orderId, String newStatus) {
+        String sql = "UPDATE ORDERS SET Order_status=? WHERE Order_id=?";
+        return jdbcTemplate.update(sql, newStatus, orderId);
+    }
+
 }

@@ -44,4 +44,13 @@ public class ProductItemDAO {
         String sql = "DELETE FROM PRODUCT_ITEM WHERE Serial_no=?";
         return jdbcTemplate.update(sql, serialNo);
     }
+
+    // Use Case 3M: ดึง Product Items สำหรับ Order นี้
+    public List<ProductItem> findByOrderId(long orderId) {
+        String sql = "SELECT * FROM PRODUCT_ITEM WHERE Order_id=?";
+        return jdbcTemplate.query(sql, new Object[]{orderId}, (rs, rowNum) -> new ProductItem(
+                rs.getString("Serial_no"),
+                rs.getInt("Model_id")
+        ));
+    }
 }
