@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecipeMaterial {
-    private int recipeId;
-    private int materialId;
-    private int requiredQuantity;
+public class ProductItem {
+    private String serialNo;
+    private int modelId;
 }

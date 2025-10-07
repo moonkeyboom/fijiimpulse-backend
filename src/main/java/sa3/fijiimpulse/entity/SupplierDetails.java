@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Material {
-    private int materialId;
+public class SupplierDetails {
     private int supplierId;
-    private String materialName;
-    private int stockQuantity;
-    private String materialImage;
-    private java.sql.Timestamp lastUpdated;
+    private String companyName;
+    private String phoneNumber;
+    private String supplierEmail;
 }

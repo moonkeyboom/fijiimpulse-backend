@@ -1,24 +1,21 @@
 package sa3.fijiimpulse.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductModel {
-    private Long modelId;
+    private int modelId;
+    private int recipeId;
     private String modelName;
     private BigDecimal price;
-
-    public Long getModelId() { return modelId; }
-    public void setModelId(Long modelId) { this.modelId = modelId; }
-
-    public String getModelName() { return modelName; }
-    public void setModelName(String modelName) { this.modelName = modelName; }
-
-    public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
-
-    public ProductModel(Long modelId, String modelName, BigDecimal price) {
-        this.modelId = modelId;
-        this.modelName = modelName;
-        this.price = price;
-    }
+    private String modelImage;
+    private String description;
 }
+
+

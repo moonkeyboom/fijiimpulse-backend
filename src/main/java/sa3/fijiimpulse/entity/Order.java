@@ -1,39 +1,26 @@
 package sa3.fijiimpulse.entity;
 
-import sa3.fijiimpulse.service.enums.OrderStatus;
+import java.math.BigDecimal;
 
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order {
-    private Long orderId;
-    private Long userId;
-    private LocalDateTime orderDate;
-    private OrderStatus orderStatus;
-    private Address address; // composite attribute
-
-    public Order() {}
-
-    public Order(Long orderId, Long userId, LocalDateTime orderDate, String orderStatus, Address address) {
-        this.orderId = orderId;
-        this.userId = userId;
-        this.orderDate = orderDate;
-        this.orderStatus = OrderStatus.NOT_CREATED;
-        this.address = address;
-    }
-
-    // getters & setters
-    public Long getOrderId() { return orderId; }
-    public void setOrderId(Long orderId) { this.orderId = orderId; }
-
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
-
-    public LocalDateTime getOrderDate() { return orderDate; }
-    public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
-
-    public OrderStatus getOrderStatus() { return orderStatus; }
-    public void setOrderStatus(OrderStatus orderStatus) { this.orderStatus = orderStatus; }
-
-    public Address getAddress() { return address; }
-    public void setAddress(Address address) { this.address = address; }
+    private long orderId;
+    private int userId;
+    private String orderStatus;
+    private String recipientName;
+    private String phoneNumber;
+    private String district;
+    private String houseAddress;
+    private String subDistrict;
+    private String streetName;
+    private String province;
+    private String postalCode;
+    private java.sql.Timestamp orderDate;
+    private BigDecimal grandTotalPrice;
 }
