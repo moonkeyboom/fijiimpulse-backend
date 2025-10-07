@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import sa3.fijiimpulse.entity.Address;
 import sa3.fijiimpulse.entity.Order;
+import sa3.fijiimpulse.entity.Product;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -42,5 +43,16 @@ public class OrderRepository {
             );
         }, id);
     }
+
+//    public List<Order> findAll() {
+//        String sql = "SELECT * FROM orders";
+////        return jdbcTemplate.query(sql, (rs, rowNum) ->
+////                new Order(
+////                        rs.getLong("order_id"),
+////                        rs.getString("order_status"),
+////                        rs.getLong("user_id"),
+////                        rs.getTimestamp("order_date").toLocalDateTime(),
+////                );
+//    }
 
 }

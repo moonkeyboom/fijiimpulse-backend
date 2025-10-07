@@ -1,12 +1,14 @@
 package sa3.fijiimpulse.entity;
 
+import sa3.fijiimpulse.service.enums.OrderStatus;
+
 import java.time.LocalDateTime;
 
 public class Order {
     private Long orderId;
     private Long userId;
     private LocalDateTime orderDate;
-    private String orderStatus;
+    private OrderStatus orderStatus;
     private Address address; // composite attribute
 
     public Order() {}
@@ -15,7 +17,7 @@ public class Order {
         this.orderId = orderId;
         this.userId = userId;
         this.orderDate = orderDate;
-        this.orderStatus = orderStatus;
+        this.orderStatus = OrderStatus.NOT_CREATED;
         this.address = address;
     }
 
@@ -29,8 +31,8 @@ public class Order {
     public LocalDateTime getOrderDate() { return orderDate; }
     public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
 
-    public String getOrderStatus() { return orderStatus; }
-    public void setOrderStatus(String orderStatus) { this.orderStatus = orderStatus; }
+    public OrderStatus getOrderStatus() { return orderStatus; }
+    public void setOrderStatus(OrderStatus orderStatus) { this.orderStatus = orderStatus; }
 
     public Address getAddress() { return address; }
     public void setAddress(Address address) { this.address = address; }
