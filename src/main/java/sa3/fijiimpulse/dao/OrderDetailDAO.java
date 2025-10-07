@@ -62,4 +62,18 @@ public class OrderDetailDAO {
                 rs.getBigDecimal("Total_price")
         ));
     }
+
+    public OrderDetail findByOrderIdAndModelId(long orderId, int modelId) {
+        String sql = "SELECT * FROM ORDER_DETAILS WHERE Order_id=? AND Model_id=?";
+        List<OrderDetail> list = jdbcTemplate.query(sql, new Object[]{orderId, modelId},
+                (rs, rowNum) -> new OrderDetail(
+                        rs.getLong("Order_detail_id"),
+                        rs.getLong("Order_id"),
+                        rs.getInt("Model_id"),
+                        rs.getInt("Order_quantity"),
+                        rs.getBigDecimal("Total_price")
+                ));
+        return list.isEmpty() ? null : list.get(0);
+    }
+
 }

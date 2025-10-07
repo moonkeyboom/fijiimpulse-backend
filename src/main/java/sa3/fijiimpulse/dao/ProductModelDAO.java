@@ -53,4 +53,18 @@ public class ProductModelDAO {
         String sql = "DELETE FROM PRODUCT_MODEL WHERE Model_id=?";
         return jdbcTemplate.update(sql, id);
     }
+
+    public ProductModel findByRecipeId(int recipeId) {
+        String sql = "SELECT * FROM PRODUCT_MODEL WHERE Recipe_id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{recipeId}, (rs, rowNum) -> new ProductModel(
+                rs.getInt("Model_id"),
+                rs.getInt("Recipe_id"),
+                rs.getString("Model_name"),
+                rs.getBigDecimal("Price"),
+                rs.getString("Model_image"),
+                rs.getString("Description")
+        ));
+    }
+
+
 }

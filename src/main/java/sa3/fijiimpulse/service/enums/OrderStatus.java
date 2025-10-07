@@ -5,7 +5,7 @@ public enum OrderStatus {
  PAYMENT_EVIDENCE_PENDING("รอชำระเงินและอัปโหลดหลักฐานการชำระเงิน"),
  PAYMENT_EVIDENCE_PENDING_AGAIN("รอชำระเงินและอัปโหลดหลักฐานการชำระเงินอีกครั้ง"),
  PAYMENT_APPROVED("ได้รับการยืนยันการชำระเงิน"),
- PRODECED("สินค้าถูกผลิต"),
+ PRODUCED("สินค้าถูกผลิต"),
  READY_TO_SHIP("รอจัดส่งสินค้า"),
  SHIPPED("กำลังจัดส่ง"),
  DELIVERED("จัดส่งสำเร็จ");
