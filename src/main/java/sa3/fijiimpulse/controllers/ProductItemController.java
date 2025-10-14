@@ -4,9 +4,12 @@ package sa3.fijiimpulse.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sa3.fijiimpulse.entity.ProductItem;
+import sa3.fijiimpulse.service.MaterialService;
 import sa3.fijiimpulse.service.ProductItemService;
+import sa3.fijiimpulse.service.RecipeMaterialService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/product-items")
@@ -14,6 +17,12 @@ public class ProductItemController {
 
     @Autowired
     private ProductItemService productItemService;
+    @Autowired
+    private MaterialController materialController;
+    @Autowired
+    private MaterialService materialService;
+    @Autowired
+    private RecipeMaterialService recipeMaterialService;
 
     // POST: Create new ProductItem
     @PostMapping
@@ -54,5 +63,23 @@ public class ProductItemController {
                                 @RequestParam int quantity) {
         productItemService.addProductItemsToOrder(modelId, orderId, quantity);
         return quantity + " ProductItems assigned to Order " + orderId;
+    }
+
+    @PostMapping("/create-multiple")
+    public void createMultipleProductItems(@RequestBody Map<Integer, Integer> productItems) {
+        for (Map.Entry<Integer, Integer> entry : productItems.entrySet()) {
+            int modelId = entry.getKey();
+            int qnt = entry.getValue();
+            for (int i=0;i<qnt;i++) {
+                productItemService.addProductItem(modelId);
+                Map<Integer, Map<String, Object>> recipe = recipeMaterialService.getModelRecipe(modelId);
+                for (Map.Entry<Integer, Map<String, Object>> modelEntry : recipe.entrySet()) {
+                    int matId = modelEntry.getKey();
+                    Object reqObj = modelEntry.getValue().get("required_quantity");
+                    int requireQnt = ((Number) reqObj).intValue();
+                    materialService.reduceMaterial(matId, requireQnt);
+                }
+            }
+        }
     }
 }

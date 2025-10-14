@@ -66,4 +66,22 @@ public class ProductItemService {
             productItemDAO.save(newItem);
         }
     }
+
+    public void addProductItem(int modelId) {
+        ProductItem newItem = new ProductItem();
+        newItem.setSerialNo(UUID.randomUUID().toString()); // gen serialNo unique
+        newItem.setModelId(modelId);
+        newItem.setOrderId(null);
+        productItemDAO.save(newItem);
+    }
+
+//    public void addProductsToWarehouse(int modelId, int qnt) {
+//        for (int i=0; i<qnt; i++) {
+//            ProductItem newItem = new ProductItem();
+//            newItem.setSerialNo(UUID.randomUUID().toString()); // gen serialNo unique
+//            newItem.setModelId(modelId);
+//            newItem.setOrderId(null);
+//            productItemDAO.save(newItem);
+//        }
+//    }
 }
