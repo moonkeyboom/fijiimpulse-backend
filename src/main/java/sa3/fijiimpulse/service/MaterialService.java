@@ -52,4 +52,7 @@ public class MaterialService {
         int rowsAffected = materialDAO.reduceMaterialStock(materialId, reduceQuantity);
         return rowsAffected > 0;
     }
+
+
+
 }

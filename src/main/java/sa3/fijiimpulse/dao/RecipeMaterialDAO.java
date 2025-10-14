@@ -4,7 +4,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import sa3.fijiimpulse.entity.RecipeMaterial;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class RecipeMaterialDAO {
@@ -55,5 +58,32 @@ public class RecipeMaterialDAO {
                 rs.getInt("Material_id"),
                 rs.getInt("Required_quantity")
         ));
+    }
+
+    public Map<Integer, Map<String, Object>> findByModelId(int modelId) {
+        String sql = """
+        SELECT 
+            m.material_id,
+            m.material_name, 
+            m.material_image, 
+            rm.required_quantity 
+        FROM PRODUCT_MODEL pm 
+        JOIN RECIPE r ON pm.recipe_id = r.recipe_id 
+        JOIN RECIPE_MATERIAL rm ON r.recipe_id = rm.recipe_id 
+        JOIN MATERIAL m ON rm.material_id = m.material_id 
+        WHERE pm.model_id = ?
+    """;
+
+        return jdbcTemplate.query(sql, new Object[]{modelId}, rs -> {
+            Map<Integer, Map<String, Object>> result = new LinkedHashMap<>();
+            while (rs.next()) {
+                Map<String, Object> materialDetail = new HashMap<>();
+                materialDetail.put("material_name", rs.getString("material_name"));
+                materialDetail.put("material_image", rs.getString("material_image"));
+                materialDetail.put("required_quantity", rs.getInt("required_quantity"));
+                result.put(rs.getInt("material_id"), materialDetail);
+            }
+            return result;
+        });
     }
 }
