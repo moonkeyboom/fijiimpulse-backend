@@ -42,4 +42,11 @@ public class ProductItemDAO {
         String sql = "DELETE FROM PRODUCT_ITEM WHERE Serial_no = ?";
         return jdbcTemplate.update(sql, serialNo);
     }
+
+    // หา ProductItem ที่ยังไม่ถูก assign ให้ Order (orderId IS NULL)
+    public List<ProductItem> findAvailableByModelId(int modelId) {
+        String sql = "SELECT * FROM PRODUCT_ITEM WHERE Model_id = ? AND Order_id IS NULL";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(ProductItem.class), modelId);
+    }
+
 }

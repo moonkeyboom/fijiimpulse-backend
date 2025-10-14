@@ -12,10 +12,18 @@ public class ProductItem {
     private int modelId;
     private Long orderId;
 
+    public ProductItem() {
+    }
+
     public ProductItem(String serialNo, int modelId, Long orderId) {
         this.serialNo = serialNo;
         this.modelId = modelId;
         this.orderId = orderId;
+    }
+
+    public ProductItem(String serialNo, int modelId) {
+        this.serialNo = serialNo;
+        this.modelId = modelId;
     }
 
     public String getSerialNo() {

@@ -47,4 +47,12 @@ public class ProductItemController {
         productItemService.delete(serialNo);
         return "ProductItem deleted successfully!";
     }
+
+    @PostMapping("/assign")
+    public String assignToOrder(@RequestParam int modelId,
+                                @RequestParam long orderId,
+                                @RequestParam int quantity) {
+        productItemService.addProductItemsToOrder(modelId, orderId, quantity);
+        return quantity + " ProductItems assigned to Order " + orderId;
+    }
 }

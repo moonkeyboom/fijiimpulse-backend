@@ -7,6 +7,7 @@ import sa3.fijiimpulse.dao.ProductItemDAO;
 import sa3.fijiimpulse.entity.ProductItem;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductItemService {
@@ -37,5 +38,32 @@ public class ProductItemService {
     // Delete
     public int delete(String serialNo) {
         return productItemDAO.delete(serialNo);
+    }
+
+
+    // เพิ่ม ProductItem เข้ากับ Order
+    public void addProductItemsToOrder(int modelId, long orderId, int quantity) {
+        // 1. ดึง ProductItem ที่ยังไม่ถูก assign (orderId = null)
+        List<ProductItem> availableItems = productItemDAO.findAvailableByModelId(modelId);
+
+        int availableCount = availableItems.size();
+
+        // 2. Assign เท่าที่มี
+        int assigned = 0;
+        for (ProductItem item : availableItems) {
+            if (assigned >= quantity) break;
+            productItemDAO.updateOrder(item.getSerialNo(), orderId);
+            assigned++;
+        }
+
+        // 3. ถ้าไม่พอ → ต้องสร้างเพิ่ม
+        int remaining = quantity - assigned;
+        for (int i = 0; i < remaining; i++) {
+            ProductItem newItem = new ProductItem();
+            newItem.setSerialNo(UUID.randomUUID().toString()); // gen serialNo unique
+            newItem.setModelId(modelId);
+            newItem.setOrderId(orderId);
+            productItemDAO.save(newItem);
+        }
     }
 }
