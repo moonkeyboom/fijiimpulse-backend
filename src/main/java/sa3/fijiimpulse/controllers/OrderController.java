@@ -4,19 +4,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sa3.fijiimpulse.entity.Order;
 import sa3.fijiimpulse.entity.Payment;
+import sa3.fijiimpulse.entity.ProductItem;
 import sa3.fijiimpulse.service.OrderService;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/orders")
 public class OrderController {
 
     private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
+    }
+
+    @GetMapping
+    public List<Order> getAllOrders() {
+        return orderService.getAllOrders();
     }
 
     // ==================== Use Case 2M: ตรวจสอบและยืนยันหลักฐานการชำระเงิน ====================
@@ -67,5 +73,12 @@ public class OrderController {
     public ResponseEntity<Map<String, Object>> checkMaterials(@PathVariable long orderId) {
         Map<String, Object> result = orderService.checkMaterialsForOrder(orderId);
         return ResponseEntity.ok(result);
+    }
+
+    //======
+    // ดึง ProductItem ทั้งหมดของ Order
+    @GetMapping("/{orderId}/items")
+    public List<ProductItem> getProductItemsByOrderId(@PathVariable long orderId) {
+        return orderService.getProductItemsByOrderId(orderId);
     }
 }

@@ -141,4 +141,10 @@ public class OrderService {
 
         return result;
     }
+
+
+    // ดึง ProductItem ทั้งหมดของ Order
+    public List<ProductItem> getProductItemsByOrderId(long orderId) {
+        return productItemDAO.findByOrderId(orderId);
+    }
 }

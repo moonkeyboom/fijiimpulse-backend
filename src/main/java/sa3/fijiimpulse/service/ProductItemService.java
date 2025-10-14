@@ -40,6 +40,10 @@ public class ProductItemService {
         return productItemDAO.delete(serialNo);
     }
 
+    public List<ProductItem> getProductItemsByOrderId(long orderId) {
+        return productItemDAO.findByOrderId(orderId);
+    }
+
 
     // เพิ่ม ProductItem เข้ากับ Order
     public void addProductItemsToOrder(int modelId, long orderId, int quantity) {
