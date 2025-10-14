@@ -52,4 +52,16 @@ public class MaterialDAO {
         String sql = "DELETE FROM MATERIAL WHERE Material_id=?";
         return jdbcTemplate.update(sql, id);
     }
+
+    // Use Case 4M: เพิ่มจำนวน Stock
+    public int addMaterialStock(int materialId, int additionalQuantity) {
+        String sql = "UPDATE MATERIAL SET Stock_quantity = Stock_quantity + ?, Last_updated = CURRENT_TIMESTAMP WHERE Material_id=?";
+        return jdbcTemplate.update(sql, additionalQuantity, materialId);
+    }
+
+    // Use Case 4M: ลด Stock
+    public int reduceMaterialStock(int materialId, int reduceQuantity) {
+        String sql = "UPDATE MATERIAL SET Stock_quantity = Stock_quantity - ?, Last_updated = CURRENT_TIMESTAMP WHERE Material_id=? AND Stock_quantity >= ?";
+        return jdbcTemplate.update(sql, reduceQuantity, materialId, reduceQuantity);
+    }
 }

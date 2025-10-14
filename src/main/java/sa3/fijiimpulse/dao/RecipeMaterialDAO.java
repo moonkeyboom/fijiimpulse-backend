@@ -46,4 +46,14 @@ public class RecipeMaterialDAO {
         String sql = "DELETE FROM RECIPE_MATERIAL WHERE Recipe_id=? AND Material_id=?";
         return jdbcTemplate.update(sql, recipeId, materialId);
     }
+
+    // Use Case 3M: ดึงวัสดุที่ต้องใช้สำหรับ Recipe นี้
+    public List<RecipeMaterial> findByRecipeId(int recipeId) {
+        String sql = "SELECT * FROM RECIPE_MATERIAL WHERE Recipe_id=?";
+        return jdbcTemplate.query(sql, new Object[]{recipeId}, (rs, rowNum) -> new RecipeMaterial(
+                rs.getInt("Recipe_id"),
+                rs.getInt("Material_id"),
+                rs.getInt("Required_quantity")
+        ));
+    }
 }
