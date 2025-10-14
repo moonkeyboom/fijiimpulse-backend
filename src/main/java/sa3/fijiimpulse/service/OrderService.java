@@ -85,6 +85,7 @@ public class OrderService {
 
     // ==================== Use Case 3M: ตรวจสอบทรัพยากร ====================
 
+
     public Map<String, Object> checkMaterialsForOrder(long orderId) {
         Map<String, Object> result = new HashMap<>();
 

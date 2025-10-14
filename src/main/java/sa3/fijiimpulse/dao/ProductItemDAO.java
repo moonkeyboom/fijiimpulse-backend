@@ -3,15 +3,33 @@ package sa3.fijiimpulse.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import sa3.fijiimpulse.entity.ProductItem;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
 public class ProductItemDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    public ProductItemDAO(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    private RowMapper<ProductItem> productItemRowMapper = new RowMapper<ProductItem>() {
+        @Override
+        public ProductItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+            ProductItem item = new ProductItem();
+            item.setSerialNo(rs.getString("serial_no"));
+            item.setModelId(rs.getInt("model_id"));
+            item.setOrderId(rs.getObject("order_id") != null ? rs.getLong("order_id") : null); // nullable
+            return item;
+        }
+    };
 
     // INSERT
     public int save(ProductItem item) {
@@ -49,4 +67,8 @@ public class ProductItemDAO {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(ProductItem.class), modelId);
     }
 
+    public List<ProductItem> findByOrderId(long orderId) {
+        String sql = "SELECT * FROM product_item WHERE order_id = ?";
+        return jdbcTemplate.query(sql, productItemRowMapper, orderId);
+    }
 }
