@@ -10,18 +10,12 @@ import lombok.NoArgsConstructor;
 public class ProductItem {
     private String serialNo;
     private int modelId;
+    private Long orderId;
 
-    public ProductItem(String serialNo, int modelId) {
+    public ProductItem(String serialNo, int modelId, Long orderId) {
         this.serialNo = serialNo;
         this.modelId = modelId;
-    }
-
-    public int getModelId() {
-        return modelId;
-    }
-
-    public void setModelId(int modelId) {
-        this.modelId = modelId;
+        this.orderId = orderId;
     }
 
     public String getSerialNo() {
@@ -32,11 +26,28 @@ public class ProductItem {
         this.serialNo = serialNo;
     }
 
+    public int getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(int modelId) {
+        this.modelId = modelId;
+    }
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
+
     @Override
     public String toString() {
         return "ProductItem{" +
                 "serialNo='" + serialNo + '\'' +
                 ", modelId=" + modelId +
+                ", orderId=" + orderId +
                 '}';
     }
 }
