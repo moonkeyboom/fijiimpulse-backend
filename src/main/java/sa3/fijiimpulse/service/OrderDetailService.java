@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import sa3.fijiimpulse.dao.OrderDetailDAO;
 import sa3.fijiimpulse.entity.OrderDetail;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -38,5 +39,21 @@ public class OrderDetailService {
         return orderDetailDAO.findByOrderId(orderId);
     }
 
+// ---------------***********************------------------------
+    public int addOrUpdateOrderDetail(long orderId, int modelId, int quantity, BigDecimal price) {
+        OrderDetail existing = orderDetailDAO.findByOrderIdAndModelId(orderId, modelId);
+        if (existing != null) {
+            existing.setOrderQuantity(existing.getOrderQuantity() + quantity);
+            existing.setTotalPrice(existing.getTotalPrice().add(price.multiply(new BigDecimal(quantity))));
+            return orderDetailDAO.update(existing);
+        } else {
+            OrderDetail od = new OrderDetail();
+            od.setOrderId(orderId);
+            od.setModelId(modelId);
+            od.setOrderQuantity(quantity);
+            od.setTotalPrice(price.multiply(new BigDecimal(quantity)));
+            return orderDetailDAO.insert(od);
+        }
+    }
 
 }

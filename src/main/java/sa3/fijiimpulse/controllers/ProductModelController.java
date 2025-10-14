@@ -31,7 +31,7 @@ public class ProductModelController {
         return productService.getProductById(id);
     }
 
-    // ดูสินค้าโดย Recipe_id (optional helper)
+    // ดูสินค้าโดย Recipe_id
     @GetMapping("/recipe/{recipeId}")
     public ProductModel getProductByRecipeId(@PathVariable int recipeId) {
         return productService.getProductByRecipeId(recipeId);

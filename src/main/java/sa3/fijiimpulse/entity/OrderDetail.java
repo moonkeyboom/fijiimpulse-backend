@@ -16,6 +16,9 @@ public class OrderDetail {
     private int orderQuantity;
     private BigDecimal totalPrice;
 
+    public OrderDetail() {
+    }
+
     public OrderDetail(long orderDetailId, long orderId, int modelId, int orderQuantity, BigDecimal totalPrice) {
         this.orderDetailId = orderDetailId;
         this.orderId = orderId;
