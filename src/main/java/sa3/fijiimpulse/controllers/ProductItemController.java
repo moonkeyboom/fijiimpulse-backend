@@ -57,13 +57,27 @@ public class ProductItemController {
         return "ProductItem deleted successfully!";
     }
 
-    @PostMapping("/assign")
-    public String assignToOrder(@RequestParam int modelId,
-                                @RequestParam long orderId,
-                                @RequestParam int quantity) {
-        productItemService.addProductItemsToOrder(modelId, orderId, quantity);
-        return quantity + " ProductItems assigned to Order " + orderId;
+//    @PostMapping("/adjust-items")
+//    public String assignToOrder(@RequestParam int modelId,
+//                                @RequestParam long orderId,
+//                                @RequestParam int quantity) {
+//        productItemService.adjustProductItemsForOrder(modelId, orderId, quantity);
+//        return quantity + " ProductItems assigned to Order " + orderId;
+//    }
+
+
+
+    @PostMapping("/adjust-items")
+    public String adjustProductItemsForOrder(
+            @RequestParam long orderId,
+            @RequestParam int modelId,
+            @RequestParam int quantity) {
+        productItemService.adjustProductItemsForOrder(modelId, orderId, quantity);
+        return "Adjusted ProductItems for Order ID " + orderId +
+                " (Model ID: " + modelId + ", Desired Quantity: " + quantity + ")";
     }
+//    POST http://localhost:8080/product-items/adjust-items?orderId=10&modelId=2&quantity=2
+//    GET http://localhost:8081/orders/10/items
 
     @PostMapping("/create-multiple")
     public void createMultipleProductItems(@RequestBody Map<Integer, Integer> productItems) {

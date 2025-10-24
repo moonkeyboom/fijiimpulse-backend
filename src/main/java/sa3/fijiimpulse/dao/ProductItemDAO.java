@@ -71,4 +71,17 @@ public class ProductItemDAO {
         String sql = "SELECT * FROM product_item WHERE order_id = ?";
         return jdbcTemplate.query(sql, productItemRowMapper, orderId);
     }
+
+
+    // ดึง ProductItem ที่อยู่ใน orderId + modelId นั้น ๆ
+    public List<ProductItem> findByOrderIdAndModelId(long orderId, int modelId) {
+        String sql = "SELECT * FROM product_item WHERE order_id = ? AND model_id = ?";
+        return jdbcTemplate.query(sql, productItemRowMapper, orderId, modelId);
+    }
+
+    // อัปเดต order_id = null (ใช้ตอนถอดออกจาก order)
+    public int clearOrderId(String serialNo) {
+        String sql = "UPDATE product_item SET order_id = NULL WHERE serial_no = ?";
+        return jdbcTemplate.update(sql, serialNo);
+    }
 }

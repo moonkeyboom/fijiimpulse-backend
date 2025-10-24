@@ -17,6 +17,9 @@ public class Payment {
     private java.sql.Timestamp paymentDate;
     private String paymentReceipt;
 
+    public Payment() {
+    }
+
     public Payment(long paymentId, long orderId, BigDecimal totalAmount, Timestamp paymentDate, String paymentReceipt) {
         this.paymentId = paymentId;
         this.orderId = orderId;
