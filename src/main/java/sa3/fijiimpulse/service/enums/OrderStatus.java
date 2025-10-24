@@ -3,7 +3,8 @@ package sa3.fijiimpulse.service.enums;
 public enum OrderStatus {
  NOT_CREATED("ไม่ถูกสร้าง"),
  PAYMENT_EVIDENCE_PENDING("รอชำระเงินและอัปโหลดหลักฐานการชำระเงิน"),
- PAYMENT_EVIDENCE_PENDING_AGAIN("รอชำระเงินและอัปโหลดหลักฐานการชำระเงินอีกครั้ง"),
+ PAYMENT_EVIDENCE_PENDING_AGAIN("หลักฐานการชำระเงินถูกปฏิเสธ รอชำระเงินและอัปโหลดหลักฐานการชำระเงินอีกครั้ง"),
+ PENDING_RECEIPT_VERIFICATION("รอตรวจสอบหลักฐานการชำระเงิน"),
  PAYMENT_APPROVED("ได้รับการยืนยันการชำระเงิน"),
  PRODUCED("สินค้าถูกผลิต"),
  READY_TO_SHIP("รอจัดส่งสินค้า"),

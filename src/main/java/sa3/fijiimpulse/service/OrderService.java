@@ -13,6 +13,7 @@ import sa3.fijiimpulse.entity.ProductItem;
 import sa3.fijiimpulse.entity.ProductModel;
 import sa3.fijiimpulse.entity.RecipeMaterial;
 import sa3.fijiimpulse.entity.Material;
+import sa3.fijiimpulse.service.enums.OrderStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,8 @@ public class OrderService {
     // ==================== Use Case 2M: ตรวจสอบและยืนยันหลักฐานการชำระเงิน ====================
 
     public List<Order> getPendingPaymentOrders() {
-        return orderDAO.findByOrderStatus("รอตรวจสอบหลักฐานการชำระเงิน");
+//        return orderDAO.findByOrderStatus("รอตรวจสอบหลักฐานการชำระเงิน");_
+        return orderDAO.findByOrderStatus(OrderStatus.PENDING_RECEIPT_VERIFICATION.getThaiTranslation());
     }
 
     public Payment getPaymentByOrderId(long orderId) {
@@ -74,12 +76,14 @@ public class OrderService {
     }
 
     public boolean approvePayment(long orderId) {
-        int result = orderDAO.updateOrderStatus(orderId, "ได้รับการยืนยันการชำระเงิน");
+//        int result = orderDAO.updateOrderStatus(orderId, "ได้รับการยืนยันการชำระเงิน");
+        int result = orderDAO.updateOrderStatus(orderId,OrderStatus.PAYMENT_APPROVED.getThaiTranslation());
         return result > 0;
     }
 
     public boolean rejectPayment(long orderId) {
-        int result = orderDAO.updateOrderStatus(orderId, "หลักฐานการชำระเงินถูกปฏิเสธ รอชำระเงินและอัปโหลดหลักฐานการชำระเงินอีกครั้ง");
+//        int result = orderDAO.updateOrderStatus(orderId, "หลักฐานการชำระเงินถูกปฏิเสธ รอชำระเงินและอัปโหลดหลักฐานการชำระเงินอีกครั้ง");
+        int result = orderDAO.updateOrderStatus(orderId, OrderStatus.PAYMENT_EVIDENCE_PENDING_AGAIN.getThaiTranslation());
         return result > 0;
     }
 
