@@ -3,6 +3,7 @@ package sa3.fijiimpulse.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.Column;
 
 import java.math.BigDecimal;
 
@@ -14,10 +15,16 @@ public class ProductModel {
     private int recipeId;
     private String modelName;
     private BigDecimal price;
-    private String modelImage;
+
+    @Column(name = "Model_image")
+    private byte[] modelImage; // ใช้ byte[] เพื่อเก็บภาพใน DB
+
     private String description;
 
-    public ProductModel(int modelId, int recipeId, String modelName, BigDecimal price, String modelImage, String description) {
+    public ProductModel() {
+    }
+
+    public ProductModel(int modelId, int recipeId, String modelName, BigDecimal price, byte[] modelImage, String description) {
         this.modelId = modelId;
         this.recipeId = recipeId;
         this.modelName = modelName;
@@ -58,11 +65,11 @@ public class ProductModel {
         this.price = price;
     }
 
-    public String getModelImage() {
+    public byte[] getModelImage() {
         return modelImage;
     }
 
-    public void setModelImage(String modelImage) {
+    public void setModelImage(byte[] modelImage) {
         this.modelImage = modelImage;
     }
 
@@ -81,7 +88,7 @@ public class ProductModel {
                 ", recipeId=" + recipeId +
                 ", modelName='" + modelName + '\'' +
                 ", price=" + price +
-                ", modelImage='" + modelImage + '\'' +
+                ", modelImage=" + (modelImage != null ? "[BLOB data]" : "null") +
                 ", description='" + description + '\'' +
                 '}';
     }

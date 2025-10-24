@@ -3,6 +3,7 @@ package sa3.fijiimpulse.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.Column;
 
 import java.sql.Timestamp;
 
@@ -14,10 +15,16 @@ public class Material {
     private int supplierId;
     private String materialName;
     private int stockQuantity;
-    private String materialImage;
+
+    @Column(name = "Material_image")
+    private byte[] materialImage; // ใช้ byte[] เพื่อเก็บภาพใน DB
+
     private java.sql.Timestamp lastUpdated;
 
-    public Material(int materialId, int supplierId, String materialName, int stockQuantity, String materialImage, Timestamp lastUpdated) {
+    public Material() {
+    }
+
+    public Material(int materialId, int supplierId, String materialName, int stockQuantity, byte[] materialImage, Timestamp lastUpdated) {
         this.materialId = materialId;
         this.supplierId = supplierId;
         this.materialName = materialName;
@@ -58,11 +65,11 @@ public class Material {
         this.stockQuantity = stockQuantity;
     }
 
-    public String getMaterialImage() {
+    public byte[] getMaterialImage() {
         return materialImage;
     }
 
-    public void setMaterialImage(String materialImage) {
+    public void setMaterialImage(byte[] materialImage) {
         this.materialImage = materialImage;
     }
 
@@ -81,7 +88,7 @@ public class Material {
                 ", supplierId=" + supplierId +
                 ", materialName='" + materialName + '\'' +
                 ", stockQuantity=" + stockQuantity +
-                ", materialImage='" + materialImage + '\'' +
+                ", materialImage=" + (materialImage != null ? "[BLOB data]" : "null") +
                 ", lastUpdated=" + lastUpdated +
                 '}';
     }

@@ -21,7 +21,7 @@ public class MaterialDAO {
                 rs.getInt("Supplier_id"),
                 rs.getString("Material_name"),
                 rs.getInt("Stock_quantity"),
-                rs.getString("Material_image"),
+                rs.getBytes("Material_image"),
                 rs.getTimestamp("Last_updated")
         ));
     }
@@ -33,7 +33,7 @@ public class MaterialDAO {
                 rs.getInt("Supplier_id"),
                 rs.getString("Material_name"),
                 rs.getInt("Stock_quantity"),
-                rs.getString("Material_image"),
+                rs.getBytes("Material_image"),
                 rs.getTimestamp("Last_updated")
         ));
     }

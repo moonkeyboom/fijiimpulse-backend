@@ -22,7 +22,7 @@ public class ProductModelDAO {
                 rs.getInt("Recipe_id"),
                 rs.getString("Model_name"),
                 rs.getBigDecimal("Price"),
-                rs.getString("Model_image"),
+                rs.getBytes("Model_image"),
                 rs.getString("Description")
         ));
     }
@@ -34,7 +34,7 @@ public class ProductModelDAO {
                 rs.getInt("Recipe_id"),
                 rs.getString("Model_name"),
                 rs.getBigDecimal("Price"),
-                rs.getString("Model_image"),
+                rs.getBytes("Model_image"),
                 rs.getString("Description")
         ));
     }
@@ -61,7 +61,7 @@ public class ProductModelDAO {
                 rs.getInt("Recipe_id"),
                 rs.getString("Model_name"),
                 rs.getBigDecimal("Price"),
-                rs.getString("Model_image"),
+                rs.getBytes("Model_image"),
                 rs.getString("Description")
         ));
     }
