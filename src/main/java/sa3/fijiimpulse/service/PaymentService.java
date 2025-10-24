@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class PaymentService {
         return paymentDAO.findByOrderId(orderId);
     }
 
+
     // เพิ่ม Payment ใหม่
     public int createPayment(Payment payment) {
         return paymentDAO.insert(payment);
@@ -54,18 +56,43 @@ public class PaymentService {
         return paymentDAO.delete(paymentId);
     }
 
+//    public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
+//        // 1️⃣ บันทึกไฟล์เหมือนเดิม
+////        String uploadDir = System.getProperty("user.dir") + "/uploads/receipts/";
+//        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/uploads/receipts";
+//        File directory = new File(uploadDir);
+//        if (!directory.exists()) directory.mkdirs();
+//
+//        String fileName = "receipt_order_" + orderId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+//        Path filePath = Paths.get(uploadDir, fileName);
+//        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+//
+//        // 2️⃣ ตรวจสอบว่ามี Payment สำหรับ order นี้แล้วหรือยัง
+//        Payment existingPayment = null;
+//        try {
+//            existingPayment = paymentDAO.findByOrderId(orderId);
+//        } catch (Exception ignored) {}
+//
+//        if (existingPayment != null) {
+//            // อัปเดต Payment เดิม
+//            existingPayment.setTotalAmount(totalAmount);
+//            existingPayment.setPaymentDate(paymentDate);
+//            existingPayment.setPaymentReceipt(filePath.toString());
+//            paymentDAO.update(existingPayment);
+//        } else {
+//            // สร้าง Payment ใหม่
+//            Payment payment = new Payment();
+//            payment.setOrderId(orderId);
+//            payment.setTotalAmount(totalAmount);
+//            payment.setPaymentDate(paymentDate);
+//            payment.setPaymentReceipt(filePath.toString());
+//            paymentDAO.insert(payment);
+//        }
+//    }
+    // ✅ บันทึกรูปลงฐานข้อมูล (BLOB)
     public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
-        // 1️⃣ บันทึกไฟล์เหมือนเดิม
-//        String uploadDir = System.getProperty("user.dir") + "/uploads/receipts/";
-        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/uploads/receipts";
-        File directory = new File(uploadDir);
-        if (!directory.exists()) directory.mkdirs();
+        byte[] fileBytes = file.getBytes(); // อ่านไฟล์เป็น byte[]
 
-        String fileName = "receipt_order_" + orderId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(uploadDir, fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        // 2️⃣ ตรวจสอบว่ามี Payment สำหรับ order นี้แล้วหรือยัง
         Payment existingPayment = null;
         try {
             existingPayment = paymentDAO.findByOrderId(orderId);
@@ -75,7 +102,7 @@ public class PaymentService {
             // อัปเดต Payment เดิม
             existingPayment.setTotalAmount(totalAmount);
             existingPayment.setPaymentDate(paymentDate);
-            existingPayment.setPaymentReceipt(filePath.toString());
+            existingPayment.setPaymentReceipt(fileBytes); // ✅ ใช้ byte[]
             paymentDAO.update(existingPayment);
         } else {
             // สร้าง Payment ใหม่
@@ -83,7 +110,7 @@ public class PaymentService {
             payment.setOrderId(orderId);
             payment.setTotalAmount(totalAmount);
             payment.setPaymentDate(paymentDate);
-            payment.setPaymentReceipt(filePath.toString());
+            payment.setPaymentReceipt(fileBytes); // ✅ ใช้ byte[]
             paymentDAO.insert(payment);
         }
     }

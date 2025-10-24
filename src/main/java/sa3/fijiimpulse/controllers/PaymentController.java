@@ -1,6 +1,10 @@
 package sa3.fijiimpulse.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sa3.fijiimpulse.entity.Payment;
@@ -59,25 +63,64 @@ public class PaymentController {
         return "Payment deleted successfully!";
     }
 
-    // ✅ POST: อัปโหลดหลักฐานการชำระเงิน (MultipartFile)
     @PostMapping("/upload")
     public String uploadPayment(
             @RequestParam long orderId,
             @RequestParam BigDecimal totalAmount,
-            @RequestParam String paymentDate,   // รับเป็น String
+            @RequestParam String paymentDate,
             @RequestParam("file") MultipartFile file
     ) throws Exception {
 
-        Timestamp ts;
-        if (paymentDate.contains("T")) {
-            // แปลง "2025-10-23T12:00:00" → "2025-10-23 12:00:00"
-            ts = Timestamp.valueOf(paymentDate.replace("T", " "));
-        } else {
-            ts = Timestamp.valueOf(paymentDate);
-        }
+        Timestamp ts = paymentDate.contains("T") ?
+                Timestamp.valueOf(paymentDate.replace("T", " ")) :
+                Timestamp.valueOf(paymentDate);
 
         paymentService.savePayment(orderId, totalAmount, ts, file);
         return "Payment uploaded successfully for Order ID " + orderId;
     }
+
+    @GetMapping("/receipt/{orderId}")
+    public ResponseEntity<byte[]> downloadPaymentReceipt(@PathVariable long orderId) {
+        try {
+            Payment payment = paymentService.getPaymentByOrderId(orderId);
+            if (payment == null || payment.getPaymentReceipt() == null) {
+                // ถ้าไม่มีข้อมูล ให้ส่ง 404
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+                        .body("Receipt not found".getBytes());
+            }
+
+            String filename = "receipt_order_" + orderId + ".png";
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(payment.getPaymentReceipt()); // ✅ ไม่ต้อง .getBytes()
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            String errorMsg = "Error retrieving receipt: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+                    .body(errorMsg.getBytes());
+        }
+    }
+
+    @GetMapping("/view/{orderId}")
+    public ResponseEntity<byte[]> viewReceipt(@PathVariable long orderId) {
+        Payment payment = paymentService.getPaymentByOrderId(orderId);
+
+        if (payment == null || payment.getPaymentReceipt() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // ตั้ง header เพื่อให้ browser แสดงภาพ
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG); // หรือ MediaType.IMAGE_JPEG ตามไฟล์จริง
+
+        return new ResponseEntity<>(payment.getPaymentReceipt(), headers, HttpStatus.OK);
+    }
+
+
 
 }

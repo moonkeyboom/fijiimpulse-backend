@@ -23,7 +23,7 @@ public class PaymentDAO {
                 rs.getLong("Order_id"),
                 rs.getBigDecimal("Total_amount"),
                 rs.getTimestamp("Payment_date"),
-                rs.getString("Payment_receipt")
+                rs.getString("Payment_receipt").getBytes()
         ));
     }
 
@@ -34,9 +34,19 @@ public class PaymentDAO {
                 rs.getLong("Order_id"),
                 rs.getBigDecimal("Total_amount"),
                 rs.getTimestamp("Payment_date"),
-                rs.getString("Payment_receipt")
+                rs.getString("Payment_receipt").getBytes()
         ));
     }
+
+//    public int insert(Payment payment) {
+//        String sql = "INSERT INTO PAYMENT (Order_id, Total_amount, Payment_date, Payment_receipt) VALUES (?,?,?,?)";
+//        return jdbcTemplate.update(sql,
+//                payment.getOrderId(),
+//                payment.getTotalAmount(),
+//                payment.getPaymentDate(),
+//                payment.getPaymentReceipt()
+//        );
+//    }
 
     public int insert(Payment payment) {
         String sql = "INSERT INTO PAYMENT (Order_id, Total_amount, Payment_date, Payment_receipt) VALUES (?,?,?,?)";
@@ -44,18 +54,28 @@ public class PaymentDAO {
                 payment.getOrderId(),
                 payment.getTotalAmount(),
                 payment.getPaymentDate(),
-                payment.getPaymentReceipt()
+                payment.getPaymentReceipt() // byte[]
         );
     }
 
+//    public int update(Payment payment) {
+//        String sql = "UPDATE PAYMENT SET Order_id=?, Total_amount=?, Payment_date=?, Payment_receipt=? WHERE Payment_id=?";
+//        return jdbcTemplate.update(sql,
+//                payment.getOrderId(),
+//                payment.getTotalAmount(),
+//                payment.getPaymentDate(),
+//                payment.getPaymentReceipt(),
+//                payment.getPaymentId()
+//        );
+//    }
+
     public int update(Payment payment) {
-        String sql = "UPDATE PAYMENT SET Order_id=?, Total_amount=?, Payment_date=?, Payment_receipt=? WHERE Payment_id=?";
+        String sql = "UPDATE PAYMENT SET Total_amount=?, Payment_date=?, Payment_receipt=? WHERE Order_id=?";
         return jdbcTemplate.update(sql,
-                payment.getOrderId(),
                 payment.getTotalAmount(),
                 payment.getPaymentDate(),
-                payment.getPaymentReceipt(),
-                payment.getPaymentId()
+                payment.getPaymentReceipt(), // byte[]
+                payment.getOrderId()
         );
     }
 
@@ -65,13 +85,19 @@ public class PaymentDAO {
     }
 
     public Payment findByOrderId(long orderId) {
-        String sql = "SELECT * FROM PAYMENT WHERE Order_id=?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{orderId}, (rs, rowNum) -> new Payment(
-                rs.getLong("Payment_id"),
-                rs.getLong("Order_id"),
-                rs.getBigDecimal("Total_amount"),
-                rs.getTimestamp("Payment_date"),
-                rs.getString("Payment_receipt")
-        ));
+        String sql = "SELECT * FROM PAYMENT WHERE Order_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{orderId}, rs -> {
+            if (rs.next()) {
+                Payment p = new Payment();
+                p.setPaymentId(rs.getLong("Payment_id"));
+                p.setOrderId(rs.getLong("Order_id"));
+                p.setTotalAmount(rs.getBigDecimal("Total_amount"));
+                p.setPaymentDate(rs.getTimestamp("Payment_date"));
+                p.setPaymentReceipt(rs.getBytes("Payment_receipt"));
+                return p;
+            }
+            return null;
+        });
     }
+
 }

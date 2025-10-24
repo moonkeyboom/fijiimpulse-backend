@@ -2,25 +2,20 @@ package sa3.fijiimpulse.entity;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import jakarta.persistence.Column;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
 public class Payment {
     private long paymentId;
     private long orderId;
     private BigDecimal totalAmount;
-    private java.sql.Timestamp paymentDate;
-    private String paymentReceipt;
+    private Timestamp paymentDate;
 
-    public Payment() {
-    }
+    @Column(name = "Payment_receipt")
+    private byte[] paymentReceipt; // ใช้ byte[] เพื่อเก็บภาพใน DB
 
-    public Payment(long paymentId, long orderId, BigDecimal totalAmount, Timestamp paymentDate, String paymentReceipt) {
+    public Payment() {}
+
+    public Payment(long paymentId, long orderId, BigDecimal totalAmount, Timestamp paymentDate, byte[] paymentReceipt) {
         this.paymentId = paymentId;
         this.orderId = orderId;
         this.totalAmount = totalAmount;
@@ -60,11 +55,11 @@ public class Payment {
         this.paymentDate = paymentDate;
     }
 
-    public String getPaymentReceipt() {
+    public byte[] getPaymentReceipt() {
         return paymentReceipt;
     }
 
-    public void setPaymentReceipt(String paymentReceipt) {
+    public void setPaymentReceipt(byte[] paymentReceipt) {
         this.paymentReceipt = paymentReceipt;
     }
 
@@ -75,7 +70,7 @@ public class Payment {
                 ", orderId=" + orderId +
                 ", totalAmount=" + totalAmount +
                 ", paymentDate=" + paymentDate +
-                ", paymentReceipt='" + paymentReceipt + '\'' +
+                ", paymentReceipt=" + (paymentReceipt != null ? "[BLOB data]" : "null") +
                 '}';
     }
 }
