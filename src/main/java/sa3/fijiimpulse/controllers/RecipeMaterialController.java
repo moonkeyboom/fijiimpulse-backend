@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("api/recipe-material")
+@RequestMapping("/recipe-material")
 public class RecipeMaterialController {
     private final RecipeMaterialService recipeMaterialService;
 

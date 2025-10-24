@@ -1,7 +1,11 @@
 package sa3.fijiimpulse.controllers;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sa3.fijiimpulse.entity.Material;
 import sa3.fijiimpulse.entity.ProductItem;
 import sa3.fijiimpulse.service.MaterialService;
@@ -11,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/materials")
+@RequestMapping("/materials")
 public class MaterialController {
 
     private final MaterialService materialService;
@@ -86,6 +90,97 @@ public class MaterialController {
                 System.out.println("req" + requireQnt);
                 materialService.reduceMaterial(matId, requireQnt);
             }
+        }
+    }
+
+    // ==================== CRUD Operations ====================
+
+    @PostMapping
+    public ResponseEntity<String> createMaterial(@RequestBody Material material) {
+        try {
+            materialService.createMaterial(material);
+            return ResponseEntity.ok("Material created successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to create material: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{materialId}")
+    public ResponseEntity<String> updateMaterial(@PathVariable int materialId, @RequestBody Material material) {
+        try {
+            material.setMaterialId(materialId);
+            materialService.updateMaterial(material);
+            return ResponseEntity.ok("Material updated successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to update material: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{materialId}")
+    public ResponseEntity<String> deleteMaterial(@PathVariable int materialId) {
+        try {
+            materialService.deleteMaterial(materialId);
+            return ResponseEntity.ok("Material deleted successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to delete material: " + e.getMessage());
+        }
+    }
+
+    // ==================== Upload Material with Image ====================
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadMaterial(
+            @RequestParam int supplierId,
+            @RequestParam String materialName,
+            @RequestParam int stockQuantity,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            materialService.saveMaterialWithImage(supplierId, materialName, stockQuantity, file);
+            return ResponseEntity.ok("Material uploaded successfully with image!");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to upload material: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/upload/{materialId}")
+    public ResponseEntity<String> updateMaterialWithImage(
+            @PathVariable int materialId,
+            @RequestParam int supplierId,
+            @RequestParam String materialName,
+            @RequestParam int stockQuantity,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ) {
+        try {
+            materialService.updateMaterialWithImage(materialId, supplierId, materialName, stockQuantity, file);
+            return ResponseEntity.ok("Material updated successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to update material: " + e.getMessage());
+        }
+    }
+
+    // ==================== Image Endpoints ====================
+
+    @GetMapping("/image/{materialId}")
+    public ResponseEntity<byte[]> getMaterialImage(@PathVariable int materialId) {
+        try {
+            Material material = materialService.getMaterialById(materialId);
+            if (material == null || material.getMaterialImage() == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+                        .body("Material image not found".getBytes());
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+
+            return new ResponseEntity<>(material.getMaterialImage(), headers, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String errorMsg = "Error retrieving material image: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+                    .body(errorMsg.getBytes());
         }
     }
 }
