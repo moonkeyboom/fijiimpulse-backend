@@ -13,6 +13,7 @@ import sa3.fijiimpulse.service.PaymentService;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -91,48 +92,55 @@ public class PaymentController {
         return "Payment uploaded successfully for Order ID " + orderId;
     }
 
-
     @GetMapping("/receipt/{orderId}")
-    public ResponseEntity<byte[]> downloadPaymentReceipt(@PathVariable long orderId) {
-        try {
-            Payment payment = paymentService.getPaymentByOrderId(orderId);
-            if (payment == null || payment.getPaymentReceipt() == null) {
-                // ถ้าไม่มีข้อมูล ให้ส่ง 404
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
-                        .body("Receipt not found".getBytes());
-            }
-
-            String filename = "receipt_order_" + orderId + ".png";
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                    .contentType(MediaType.IMAGE_PNG)
-                    .body(payment.getPaymentReceipt()); // ✅ ไม่ต้อง .getBytes()
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            String errorMsg = "Error retrieving receipt: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<byte[]> downloadPaymentReceipt(@PathVariable long orderId) throws IOException {
+        Payment payment = paymentService.getPaymentByOrderId(orderId);
+        if (payment == null || payment.getPaymentReceipt() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
-                    .body(errorMsg.getBytes());
+                    .body("Receipt not found".getBytes());
         }
+
+        File imgFile = new File(payment.getPaymentReceipt());
+        if (!imgFile.exists()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+                    .body("Receipt file not found".getBytes());
+        }
+
+        String filename = imgFile.getName();
+        byte[] fileBytes = Files.readAllBytes(imgFile.toPath());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", filename);
+
+        String ext = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+        if ("png".equals(ext)) headers.setContentType(MediaType.IMAGE_PNG);
+        else if ("jpg".equals(ext) || "jpeg".equals(ext)) headers.setContentType(MediaType.IMAGE_JPEG);
+        else headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
     }
 
     @GetMapping("/view/{orderId}")
-    public ResponseEntity<byte[]> viewReceipt(@PathVariable long orderId) {
+    public ResponseEntity<byte[]> viewReceipt(@PathVariable long orderId) throws IOException {
         Payment payment = paymentService.getPaymentByOrderId(orderId);
+        if (payment == null || payment.getPaymentReceipt() == null) return ResponseEntity.notFound().build();
 
-        if (payment == null || payment.getPaymentReceipt() == null) {
-            return ResponseEntity.notFound().build();
-        }
+        File imgFile = new File(payment.getPaymentReceipt());
+        if (!imgFile.exists()) return ResponseEntity.notFound().build();
 
-        // ตั้ง header เพื่อให้ browser แสดงภาพ
+        byte[] fileBytes = Files.readAllBytes(imgFile.toPath());
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG); // หรือ MediaType.IMAGE_JPEG ตามไฟล์จริง
+        String ext = imgFile.getName().substring(imgFile.getName().lastIndexOf(".") + 1).toLowerCase();
+        if ("png".equals(ext)) headers.setContentType(MediaType.IMAGE_PNG);
+        else if ("jpg".equals(ext) || "jpeg".equals(ext)) headers.setContentType(MediaType.IMAGE_JPEG);
+        else headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
-        return new ResponseEntity<>(payment.getPaymentReceipt(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
     }
+
 
 
 

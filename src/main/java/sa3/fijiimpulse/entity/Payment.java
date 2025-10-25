@@ -2,7 +2,6 @@ package sa3.fijiimpulse.entity;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import jakarta.persistence.Column;
 
 public class Payment {
     private long paymentId;
@@ -10,12 +9,12 @@ public class Payment {
     private BigDecimal totalAmount;
     private Timestamp paymentDate;
 
-    @Column(name = "Payment_receipt")
-    private byte[] paymentReceipt; // ใช้ byte[] เพื่อเก็บภาพใน DB
+    // เปลี่ยนจาก byte[] เป็น String เก็บ path
+    private String paymentReceipt;
 
     public Payment() {}
 
-    public Payment(long paymentId, long orderId, BigDecimal totalAmount, Timestamp paymentDate, byte[] paymentReceipt) {
+    public Payment(long paymentId, long orderId, BigDecimal totalAmount, Timestamp paymentDate, String paymentReceipt) {
         this.paymentId = paymentId;
         this.orderId = orderId;
         this.totalAmount = totalAmount;
@@ -23,54 +22,19 @@ public class Payment {
         this.paymentReceipt = paymentReceipt;
     }
 
-    public long getPaymentId() {
-        return paymentId;
-    }
+    // getter / setter
+    public long getPaymentId() { return paymentId; }
+    public void setPaymentId(long paymentId) { this.paymentId = paymentId; }
 
-    public void setPaymentId(long paymentId) {
-        this.paymentId = paymentId;
-    }
+    public long getOrderId() { return orderId; }
+    public void setOrderId(long orderId) { this.orderId = orderId; }
 
-    public long getOrderId() {
-        return orderId;
-    }
+    public BigDecimal getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
 
-    public void setOrderId(long orderId) {
-        this.orderId = orderId;
-    }
+    public Timestamp getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(Timestamp paymentDate) { this.paymentDate = paymentDate; }
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public Timestamp getPaymentDate() {
-        return paymentDate;
-    }
-
-    public void setPaymentDate(Timestamp paymentDate) {
-        this.paymentDate = paymentDate;
-    }
-
-    public byte[] getPaymentReceipt() {
-        return paymentReceipt;
-    }
-
-    public void setPaymentReceipt(byte[] paymentReceipt) {
-        this.paymentReceipt = paymentReceipt;
-    }
-
-    @Override
-    public String toString() {
-        return "Payment{" +
-                "paymentId=" + paymentId +
-                ", orderId=" + orderId +
-                ", totalAmount=" + totalAmount +
-                ", paymentDate=" + paymentDate +
-                ", paymentReceipt=" + (paymentReceipt != null ? "[BLOB data]" : "null") +
-                '}';
-    }
+    public String getPaymentReceipt() { return paymentReceipt; }
+    public void setPaymentReceipt(String paymentReceipt) { this.paymentReceipt = paymentReceipt; }
 }

@@ -4,36 +4,29 @@ import org.springframework.stereotype.Service;
 import sa3.fijiimpulse.dao.PaymentDAO;
 import sa3.fijiimpulse.entity.Payment;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
-import sa3.fijiimpulse.utils.ImageUtils;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Service
 public class PaymentService {
 
     private final PaymentDAO paymentDAO;
 
+    private final String uploadDirAbsolute = System.getProperty("user.dir") + "/uploads/payment-image";
+    private final String uploadDirRelative = "uploads/payment-image";
+
     public PaymentService(PaymentDAO paymentDAO) {
         this.paymentDAO = paymentDAO;
     }
+
 
     // ดึง Payment ทั้งหมด
     public List<Payment> getAllPayments() {
@@ -66,78 +59,30 @@ public class PaymentService {
         return paymentDAO.delete(paymentId);
     }
 
-//    public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
-//        // 1️⃣ บันทึกไฟล์เหมือนเดิม
-////        String uploadDir = System.getProperty("user.dir") + "/uploads/receipts/";
-//        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/uploads/receipts";
-//        File directory = new File(uploadDir);
-//        if (!directory.exists()) directory.mkdirs();
-//
-//        String fileName = "receipt_order_" + orderId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-//        Path filePath = Paths.get(uploadDir, fileName);
-//        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-//
-//        // 2️⃣ ตรวจสอบว่ามี Payment สำหรับ order นี้แล้วหรือยัง
-//        Payment existingPayment = null;
-//        try {
-//            existingPayment = paymentDAO.findByOrderId(orderId);
-//        } catch (Exception ignored) {}
-//
-//        if (existingPayment != null) {
-//            // อัปเดต Payment เดิม
-//            existingPayment.setTotalAmount(totalAmount);
-//            existingPayment.setPaymentDate(paymentDate);
-//            existingPayment.setPaymentReceipt(filePath.toString());
-//            paymentDAO.update(existingPayment);
-//        } else {
-//            // สร้าง Payment ใหม่
-//            Payment payment = new Payment();
-//            payment.setOrderId(orderId);
-//            payment.setTotalAmount(totalAmount);
-//            payment.setPaymentDate(paymentDate);
-//            payment.setPaymentReceipt(filePath.toString());
-//            paymentDAO.insert(payment);
-//        }
-//    }
-//    // ✅ บันทึกรูปลงฐานข้อมูล (BLOB)
-//    public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
-//        byte[] compressedBytes = ImageUtils.compressAndResizeImage(file, 1024 * 1024); // 1MB
-//
-//        Payment payment = new Payment();
-//        payment.setOrderId(orderId);
-//        payment.setTotalAmount(totalAmount);
-//        payment.setPaymentDate(paymentDate);
-//        payment.setPaymentReceipt(compressedBytes);
-//
-//        paymentDAO.update(payment);
-//    }
 
     public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            throw new IOException("Payment receipt file is required.");
-        }
+        if (file == null || file.isEmpty()) throw new IOException("Payment receipt file is required.");
 
-        // ✅ เริ่มบีบอัดที่ 1 MB
-        byte[] compressedImage = ImageUtils.compressAndResizeImage(file, 1024 * 1024);
+        Path uploadPath = Paths.get(uploadDirAbsolute);
+        if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
 
-        // ✅ ถ้ายังเกิน 1 MB ให้ลดคุณภาพซ้ำ
-        if (compressedImage.length > 1024 * 1024) {
-            float quality = 0.8f;
-            while (compressedImage.length > 1024 * 1024 && quality > 0.1f) {
-                compressedImage = ImageUtils.compressAndResizeImage(file, (int) (1024 * 1024 * quality));
-                quality -= 0.05f;
-            }
-        }
+        String ext = "";
+        int dotIndex = file.getOriginalFilename().lastIndexOf('.');
+        if (dotIndex >= 0) ext = file.getOriginalFilename().substring(dotIndex);
+        String filename = "receipt_order_" + orderId + "_" + System.currentTimeMillis() + ext;
 
-        Payment payment = new Payment();
+        Path filePath = uploadPath.resolve(filename);
+        file.transferTo(filePath.toFile());
+
+        Payment payment = paymentDAO.findByOrderId(orderId);
+        if (payment == null) payment = new Payment();
+
         payment.setOrderId(orderId);
         payment.setTotalAmount(totalAmount);
         payment.setPaymentDate(paymentDate);
-        payment.setPaymentReceipt(compressedImage);
+        payment.setPaymentReceipt(uploadDirRelative + "/" + filename);
 
-        paymentDAO.update(payment);
+        if (payment.getPaymentId() > 0) paymentDAO.update(payment);
+        else paymentDAO.insert(payment);
     }
-
-
-
 }
