@@ -49,6 +49,16 @@ public class OrderService {
     }
 
     public int createOrder(Order order) {
+        // Set initial status เป็น "รอชำระเงินและอัปโหลดหลักฐานการชำระเงิน"
+        if (order.getOrderStatus() == null || order.getOrderStatus().isEmpty()) {
+            order.setOrderStatus(OrderStatus.PAYMENT_EVIDENCE_PENDING.getThaiTranslation());
+        }
+
+        // Set orderDate เป็นเวลาปัจจุบัน
+        if (order.getOrderDate() == null) {
+            order.setOrderDate(new java.sql.Timestamp(System.currentTimeMillis()));
+        }
+
         return orderDAO.insert(order);
     }
 
@@ -84,6 +94,40 @@ public class OrderService {
     public boolean rejectPayment(long orderId) {
 //        int result = orderDAO.updateOrderStatus(orderId, "หลักฐานการชำระเงินถูกปฏิเสธ รอชำระเงินและอัปโหลดหลักฐานการชำระเงินอีกครั้ง");
         int result = orderDAO.updateOrderStatus(orderId, OrderStatus.PAYMENT_EVIDENCE_PENDING_AGAIN.getThaiTranslation());
+        return result > 0;
+    }
+
+    // ==================== Use Case: Production & Shipping Flow ====================
+
+    /**
+     * UC: ทำเครื่องหมายว่าผลิตสินค้าเสร็จแล้ว
+     */
+    public boolean markAsProduced(long orderId) {
+        int result = orderDAO.updateOrderStatus(orderId, OrderStatus.PRODUCED.getThaiTranslation());
+        return result > 0;
+    }
+
+    /**
+     * UC: เตรียมจัดส่งสินค้า
+     */
+    public boolean prepareShipping(long orderId) {
+        int result = orderDAO.updateOrderStatus(orderId, OrderStatus.READY_TO_SHIP.getThaiTranslation());
+        return result > 0;
+    }
+
+    /**
+     * UC-Shipping: จัดส่งสินค้า
+     */
+    public boolean shipOrder(long orderId) {
+        int result = orderDAO.updateOrderStatus(orderId, OrderStatus.SHIPPED.getThaiTranslation());
+        return result > 0;
+    }
+
+    /**
+     * UC-Delivery: บันทึกการจัดส่งสำเร็จ
+     */
+    public boolean markAsDelivered(long orderId) {
+        int result = orderDAO.updateOrderStatus(orderId, OrderStatus.DELIVERED.getThaiTranslation());
         return result > 0;
     }
 
