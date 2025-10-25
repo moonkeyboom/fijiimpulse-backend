@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
 public class User {
     private int userId;
     private String email;

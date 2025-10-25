@@ -3,6 +3,7 @@ package sa3.fijiimpulse.dao;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import sa3.fijiimpulse.entity.User;
+import sa3.fijiimpulse.service.mapper.UserMapper;
 
 import java.util.List;
 
@@ -51,5 +52,17 @@ public class UserDAO {
     public int delete(int id) {
         String sql = "DELETE FROM USERS WHERE User_id=?";
         return jdbcTemplate.update(sql, id);
+    }
+
+    public User findByEmail(String email) {
+        String sql = "SELECT * FROM USERS WHERE email = ?";
+        List<User> users = jdbcTemplate.query(sql, new UserMapper(), email);
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    public User findByUsername(String username) {
+        String sql = "SELECT * FROM USERS WHERE username = ?";
+        List<User> users = jdbcTemplate.query(sql, new UserMapper(), username);
+        return users.isEmpty() ? null : users.get(0);
     }
 }
