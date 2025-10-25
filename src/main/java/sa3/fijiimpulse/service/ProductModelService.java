@@ -4,9 +4,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sa3.fijiimpulse.dao.ProductModelDAO;
 import sa3.fijiimpulse.entity.ProductModel;
+import sa3.fijiimpulse.utils.ImageUtils;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -47,22 +56,58 @@ public class ProductModelService {
 
     // ==================== Upload Product Model with Image ====================
 
-    public void saveProductModelWithImage(int recipeId, String modelName, BigDecimal price, String description, MultipartFile file) throws IOException {
-        byte[] fileBytes = file.getBytes(); // แปลงไฟล์เป็น byte[]
-
-        ProductModel productModel = new ProductModel();
-        productModel.setRecipeId(recipeId);
-        productModel.setModelName(modelName);
-        productModel.setPrice(price);
-        productModel.setDescription(description);
-        productModel.setModelImage(fileBytes); // เก็บรูปเป็น byte[]
-
-        productModelDAO.insert(productModel);
+//    public void saveProductModelWithImage(int recipeId, String modelName, BigDecimal price, String description, MultipartFile file) throws IOException {
+//        // บีบอัดและปรับขนาดให้ไม่เกิน 1MB
+//        byte[] compressedBytes = ImageUtils.compressAndResizeImage(file, 1024 * 1024); // 1MB
+//
+//        ProductModel productModel = new ProductModel();
+//        productModel.setRecipeId(recipeId);
+//        productModel.setModelName(modelName);
+//        productModel.setPrice(price);
+//        productModel.setDescription(description);
+//        productModel.setModelImage(compressedBytes);
+//
+//        productModelDAO.insert(productModel);
+//    }
+//
+//    public void updateProductModelWithImage(int modelId, int recipeId, String modelName, BigDecimal price, String description, MultipartFile file) throws IOException {
+//        byte[] fileBytes = file != null ? file.getBytes() : null;
+//
+//        ProductModel productModel = new ProductModel();
+//        productModel.setModelId(modelId);
+//        productModel.setRecipeId(recipeId);
+//        productModel.setModelName(modelName);
+//        productModel.setPrice(price);
+//        productModel.setDescription(description);
+//
+//        if (fileBytes != null) {
+//            productModel.setModelImage(fileBytes);
+//        } else {
+//            // ถ้าไม่มีไฟล์ใหม่ ให้ใช้รูปเดิม
+//            ProductModel existing = productModelDAO.findById(modelId);
+//            productModel.setModelImage(existing.getModelImage());
+//        }
+//
+//        productModelDAO.update(productModel);
+//    }
+public void saveProductModelWithImage(int recipeId, String modelName, BigDecimal price, String description, MultipartFile file) throws IOException {
+    byte[] compressedBytes = null;
+    if (file != null && !file.isEmpty()) {
+        // บีบอัดและปรับขนาดให้ไม่เกิน 1MB
+        compressedBytes = ImageUtils.compressAndResizeImage(file, 1024 * 1024); // 1MB
     }
 
-    public void updateProductModelWithImage(int modelId, int recipeId, String modelName, BigDecimal price, String description, MultipartFile file) throws IOException {
-        byte[] fileBytes = file != null ? file.getBytes() : null;
+    ProductModel productModel = new ProductModel();
+    productModel.setRecipeId(recipeId);
+    productModel.setModelName(modelName);
+    productModel.setPrice(price);
+    productModel.setDescription(description);
+    productModel.setModelImage(compressedBytes);
 
+    productModelDAO.insert(productModel);
+}
+
+    public void updateProductModelWithImage(int modelId, int recipeId, String modelName, BigDecimal price, String description, MultipartFile file) throws IOException {
         ProductModel productModel = new ProductModel();
         productModel.setModelId(modelId);
         productModel.setRecipeId(recipeId);
@@ -70,14 +115,14 @@ public class ProductModelService {
         productModel.setPrice(price);
         productModel.setDescription(description);
 
-        if (fileBytes != null) {
-            productModel.setModelImage(fileBytes);
+        if (file != null && !file.isEmpty()) {
+            productModel.setModelImage(ImageUtils.compressAndResizeImage(file, 1024 * 1024)); // 1MB
         } else {
-            // ถ้าไม่มีไฟล์ใหม่ ให้ใช้รูปเดิม
             ProductModel existing = productModelDAO.findById(modelId);
             productModel.setModelImage(existing.getModelImage());
         }
 
         productModelDAO.update(productModel);
     }
+
 }

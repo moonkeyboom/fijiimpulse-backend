@@ -77,6 +77,7 @@ public class ProductModelController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadProductModel(
+            @RequestParam int modelId,
             @RequestParam int recipeId,
             @RequestParam String modelName,
             @RequestParam BigDecimal price,
@@ -91,9 +92,9 @@ public class ProductModelController {
         }
     }
 
-    @PutMapping("/upload/{modelId}")
+    @PutMapping("/upload")
     public ResponseEntity<String> updateProductModelWithImage(
-            @PathVariable int modelId,
+            @RequestParam int modelId,
             @RequestParam int recipeId,
             @RequestParam String modelName,
             @RequestParam BigDecimal price,

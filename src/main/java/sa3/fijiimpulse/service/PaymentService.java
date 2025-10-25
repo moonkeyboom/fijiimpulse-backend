@@ -4,14 +4,24 @@ import org.springframework.stereotype.Service;
 import sa3.fijiimpulse.dao.PaymentDAO;
 import sa3.fijiimpulse.entity.Payment;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
+import sa3.fijiimpulse.utils.ImageUtils;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -89,30 +99,34 @@ public class PaymentService {
 //            paymentDAO.insert(payment);
 //        }
 //    }
-    // ✅ บันทึกรูปลงฐานข้อมูล (BLOB)
+//    // ✅ บันทึกรูปลงฐานข้อมูล (BLOB)
+//    public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
+//        byte[] compressedBytes = ImageUtils.compressAndResizeImage(file, 1024 * 1024); // 1MB
+//
+//        Payment payment = new Payment();
+//        payment.setOrderId(orderId);
+//        payment.setTotalAmount(totalAmount);
+//        payment.setPaymentDate(paymentDate);
+//        payment.setPaymentReceipt(compressedBytes);
+//
+//        paymentDAO.update(payment);
+//    }
     public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
-        byte[] fileBytes = file.getBytes(); // อ่านไฟล์เป็น byte[]
+        byte[] compressedBytes = null;
 
-        Payment existingPayment = null;
-        try {
-            existingPayment = paymentDAO.findByOrderId(orderId);
-        } catch (Exception ignored) {}
-
-        if (existingPayment != null) {
-            // อัปเดต Payment เดิม
-            existingPayment.setTotalAmount(totalAmount);
-            existingPayment.setPaymentDate(paymentDate);
-            existingPayment.setPaymentReceipt(fileBytes); // ✅ ใช้ byte[]
-            paymentDAO.update(existingPayment);
-        } else {
-            // สร้าง Payment ใหม่
-            Payment payment = new Payment();
-            payment.setOrderId(orderId);
-            payment.setTotalAmount(totalAmount);
-            payment.setPaymentDate(paymentDate);
-            payment.setPaymentReceipt(fileBytes); // ✅ ใช้ byte[]
-            paymentDAO.insert(payment);
+        if (file != null && !file.isEmpty()) {
+            // บีบอัดและปรับขนาดให้ไม่เกิน 1MB
+            compressedBytes = ImageUtils.compressAndResizeImage(file, 1024 * 1024); // 1MB
         }
+
+        Payment payment = new Payment();
+        payment.setOrderId(orderId);
+        payment.setTotalAmount(totalAmount);
+        payment.setPaymentDate(paymentDate);
+        payment.setPaymentReceipt(compressedBytes);
+
+        paymentDAO.update(payment);
     }
+
 
 }
