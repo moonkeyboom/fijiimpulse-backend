@@ -16,20 +16,20 @@ public class Material {
     private String materialName;
     private int stockQuantity;
 
-    @Column(name = "Material_image")
-    private byte[] materialImage; // ใช้ byte[] เพื่อเก็บภาพใน DB
+    // เปลี่ยนจาก byte[] เป็น String สำหรับเก็บ path ของไฟล์
+    private String materialImagePath;
 
     private java.sql.Timestamp lastUpdated;
 
     public Material() {
     }
 
-    public Material(int materialId, int supplierId, String materialName, int stockQuantity, byte[] materialImage, Timestamp lastUpdated) {
+    public Material(int materialId, int supplierId, String materialName, int stockQuantity, String materialImagePath, Timestamp lastUpdated) {
         this.materialId = materialId;
         this.supplierId = supplierId;
         this.materialName = materialName;
         this.stockQuantity = stockQuantity;
-        this.materialImage = materialImage;
+        this.materialImagePath = materialImagePath;
         this.lastUpdated = lastUpdated;
     }
 
@@ -65,12 +65,12 @@ public class Material {
         this.stockQuantity = stockQuantity;
     }
 
-    public byte[] getMaterialImage() {
-        return materialImage;
+    public String getMaterialImagePath() {
+        return materialImagePath;
     }
 
-    public void setMaterialImage(byte[] materialImage) {
-        this.materialImage = materialImage;
+    public void setMaterialImagePath(String materialImagePath) {
+        this.materialImagePath = materialImagePath;
     }
 
     public Timestamp getLastUpdated() {
@@ -88,7 +88,7 @@ public class Material {
                 ", supplierId=" + supplierId +
                 ", materialName='" + materialName + '\'' +
                 ", stockQuantity=" + stockQuantity +
-                ", materialImage=" + (materialImage != null ? "[BLOB data]" : "null") +
+                ", materialImagePath='" + materialImagePath + '\'' +
                 ", lastUpdated=" + lastUpdated +
                 '}';
     }

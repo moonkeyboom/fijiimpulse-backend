@@ -11,6 +11,10 @@ import sa3.fijiimpulse.entity.ProductItem;
 import sa3.fijiimpulse.service.MaterialService;
 import sa3.fijiimpulse.service.RecipeMaterialService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -160,27 +164,30 @@ public class MaterialController {
     }
 
     // ==================== Image Endpoints ====================
-
     @GetMapping("/image/{materialId}")
-    public ResponseEntity<byte[]> getMaterialImage(@PathVariable int materialId) {
-        try {
-            Material material = materialService.getMaterialById(materialId);
-            if (material == null || material.getMaterialImage() == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
-                        .body("Material image not found".getBytes());
-            }
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_PNG);
-
-            return new ResponseEntity<>(material.getMaterialImage(), headers, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            String errorMsg = "Error retrieving material image: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<byte[]> getMaterialImage(@PathVariable int materialId) throws IOException {
+        Material material = materialService.getMaterialById(materialId);
+        if (material == null || material.getMaterialImagePath() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
-                    .body(errorMsg.getBytes());
+                    .body("Material image not found".getBytes());
         }
+
+        Path imgPath = Paths.get(System.getProperty("user.dir"), material.getMaterialImagePath());
+        if (!Files.exists(imgPath)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+                    .body("Image file not found".getBytes());
+        }
+
+        byte[] imageBytes = Files.readAllBytes(imgPath);
+        HttpHeaders headers = new HttpHeaders();
+        String ext = material.getMaterialImagePath().substring(material.getMaterialImagePath().lastIndexOf('.') + 1).toLowerCase();
+        if ("png".equals(ext)) headers.setContentType(MediaType.IMAGE_PNG);
+        else if ("jpg".equals(ext) || "jpeg".equals(ext)) headers.setContentType(MediaType.IMAGE_JPEG);
+        else headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
+
 }

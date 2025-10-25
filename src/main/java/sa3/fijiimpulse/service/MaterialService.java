@@ -8,13 +8,20 @@ import sa3.fijiimpulse.entity.Material;
 import sa3.fijiimpulse.entity.ProductItem;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class MaterialService {
 
     private final MaterialDAO materialDAO;
     private final ProductItemDAO productItemDAO;
+
+    private final String uploadDirAbsolute = System.getProperty("user.dir") + "/uploads/material-image";
+    private final String uploadDirRelative = "uploads/material-image";
 
     public MaterialService(MaterialDAO materialDAO, ProductItemDAO productItemDAO) {
         this.materialDAO = materialDAO;
@@ -72,35 +79,50 @@ public class MaterialService {
     // ==================== Upload Material with Image ====================
 
     public void saveMaterialWithImage(int supplierId, String materialName, int stockQuantity, MultipartFile file) throws IOException {
-        byte[] fileBytes = file.getBytes(); // แปลงไฟล์เป็น byte[]
-
         Material material = new Material();
         material.setSupplierId(supplierId);
         material.setMaterialName(materialName);
         material.setStockQuantity(stockQuantity);
-        material.setMaterialImage(fileBytes); // เก็บรูปเป็น byte[]
+
+        if (file != null && !file.isEmpty()) {
+            Path uploadPath = Paths.get(uploadDirAbsolute);
+            if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+
+            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'));
+            String filename = UUID.randomUUID().toString() + ext;
+            Path filePath = uploadPath.resolve(filename);
+            file.transferTo(filePath.toFile());
+
+            material.setMaterialImagePath(uploadDirRelative + "/" + filename);
+        }
 
         materialDAO.insert(material);
     }
 
     public void updateMaterialWithImage(int materialId, int supplierId, String materialName, int stockQuantity, MultipartFile file) throws IOException {
-        byte[] fileBytes = file != null ? file.getBytes() : null;
-
-        Material material = new Material();
-        material.setMaterialId(materialId);
+        Material material = materialDAO.findById(materialId);
         material.setSupplierId(supplierId);
         material.setMaterialName(materialName);
         material.setStockQuantity(stockQuantity);
 
-        if (fileBytes != null) {
-            material.setMaterialImage(fileBytes);
-        } else {
-            // ถ้าไม่มีไฟล์ใหม่ ให้ใช้รูปเดิม
-            Material existing = materialDAO.findById(materialId);
-            material.setMaterialImage(existing.getMaterialImage());
+        if (file != null && !file.isEmpty()) {
+            // ลบไฟล์เก่า
+            if (material.getMaterialImagePath() != null) {
+                Path oldFile = Paths.get(System.getProperty("user.dir"), material.getMaterialImagePath());
+                if (Files.exists(oldFile)) Files.delete(oldFile);
+            }
+
+            Path uploadPath = Paths.get(uploadDirAbsolute);
+            if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+
+            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'));
+            String filename = UUID.randomUUID().toString() + ext;
+            Path filePath = uploadPath.resolve(filename);
+            file.transferTo(filePath.toFile());
+
+            material.setMaterialImagePath(uploadDirRelative + "/" + filename);
         }
 
         materialDAO.update(material);
     }
-
 }
