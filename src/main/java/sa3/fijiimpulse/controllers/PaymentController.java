@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -71,13 +73,24 @@ public class PaymentController {
             @RequestParam("file") MultipartFile file
     ) throws Exception {
 
-        Timestamp ts = paymentDate.contains("T") ?
-                Timestamp.valueOf(paymentDate.replace("T", " ")) :
-                Timestamp.valueOf(paymentDate);
+        Timestamp ts;
+
+        try {
+            // ✅ รองรับทั้งแบบมี timezone และไม่มี
+            if (paymentDate.contains("+") || paymentDate.endsWith("Z")) {
+                OffsetDateTime odt = OffsetDateTime.parse(paymentDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+                ts = Timestamp.from(odt.toInstant());
+            } else {
+                ts = Timestamp.valueOf(paymentDate.replace("T", " "));
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid paymentDate format. Use ISO 8601 or 'yyyy-MM-dd HH:mm:ss'");
+        }
 
         paymentService.savePayment(orderId, totalAmount, ts, file);
         return "Payment uploaded successfully for Order ID " + orderId;
     }
+
 
     @GetMapping("/receipt/{orderId}")
     public ResponseEntity<byte[]> downloadPaymentReceipt(@PathVariable long orderId) {

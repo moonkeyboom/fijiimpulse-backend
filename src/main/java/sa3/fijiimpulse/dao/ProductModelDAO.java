@@ -22,7 +22,7 @@ public class ProductModelDAO {
                 rs.getInt("Recipe_id"),
                 rs.getString("Model_name"),
                 rs.getBigDecimal("Price"),
-                rs.getBytes("Model_image"),
+                rs.getString("Model_image"), // ใช้ path แทน byte[]
                 rs.getString("Description")
         ));
     }
@@ -34,19 +34,32 @@ public class ProductModelDAO {
                 rs.getInt("Recipe_id"),
                 rs.getString("Model_name"),
                 rs.getBigDecimal("Price"),
-                rs.getBytes("Model_image"),
+                rs.getString("Model_image"), // ใช้ path
                 rs.getString("Description")
         ));
     }
 
     public int insert(ProductModel pm) {
         String sql = "INSERT INTO PRODUCT_MODEL (Recipe_id, Model_name, Price, Model_image, Description) VALUES (?,?,?,?,?)";
-        return jdbcTemplate.update(sql, pm.getRecipeId(), pm.getModelName(), pm.getPrice(), pm.getModelImage(), pm.getDescription());
+        return jdbcTemplate.update(sql,
+                pm.getRecipeId(),
+                pm.getModelName(),
+                pm.getPrice(),
+                pm.getModelImagePath(), // path
+                pm.getDescription()
+        );
     }
 
     public int update(ProductModel pm) {
         String sql = "UPDATE PRODUCT_MODEL SET Recipe_id=?, Model_name=?, Price=?, Model_image=?, Description=? WHERE Model_id=?";
-        return jdbcTemplate.update(sql, pm.getRecipeId(), pm.getModelName(), pm.getPrice(), pm.getModelImage(), pm.getDescription(), pm.getModelId());
+        return jdbcTemplate.update(sql,
+                pm.getRecipeId(),
+                pm.getModelName(),
+                pm.getPrice(),
+                pm.getModelImagePath(), // path
+                pm.getDescription(),
+                pm.getModelId()
+        );
     }
 
     public int delete(int id) {
@@ -61,10 +74,8 @@ public class ProductModelDAO {
                 rs.getInt("Recipe_id"),
                 rs.getString("Model_name"),
                 rs.getBigDecimal("Price"),
-                rs.getBytes("Model_image"),
+                rs.getString("Model_image"), // path
                 rs.getString("Description")
         ));
     }
-
-
 }

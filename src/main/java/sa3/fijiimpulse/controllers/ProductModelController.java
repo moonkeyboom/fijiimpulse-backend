@@ -9,7 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import sa3.fijiimpulse.entity.ProductModel;
 import sa3.fijiimpulse.service.ProductModelService;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -22,62 +27,38 @@ public class ProductModelController {
         this.productService = productService;
     }
 
-    // Step 1: แสดงรายการสินค้าทั้งหมด
+//    @GetMapping
+//    public List<ProductModel> getAllProducts() {
+//        return productService.getAllProducts();
+//    }
+//
+//    @GetMapping("/{id}")
+//    public ProductModel getProductById(@PathVariable int id) {
+//        return productService.getProductById(id);
+//    }
     @GetMapping
     public List<ProductModel> getAllProducts() {
-        return productService.getAllProducts();
+        List<ProductModel> products = productService.getAllProducts();
+        products.forEach(p -> {
+            if (p.getModelImagePath() != null) {
+                // สร้าง URL สำหรับ Postman หรือ Browser
+                p.setModelImagePath("/product-model/image/" + p.getModelId());
+            }
+        });
+        return products;
     }
 
-    // ดูรายละเอียดสินค้า ตาม Model_id
     @GetMapping("/{id}")
     public ProductModel getProductById(@PathVariable int id) {
-        return productService.getProductById(id);
-    }
-
-    // ดูสินค้าโดย Recipe_id
-    @GetMapping("/recipe/{recipeId}")
-    public ProductModel getProductByRecipeId(@PathVariable int recipeId) {
-        return productService.getProductByRecipeId(recipeId);
-    }
-
-    // ==================== CRUD Operations ====================
-
-    @PostMapping
-    public ResponseEntity<String> createProductModel(@RequestBody ProductModel productModel) {
-        try {
-            productService.createProduct(productModel);
-            return ResponseEntity.ok("Product model created successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to create product model: " + e.getMessage());
+        ProductModel p = productService.getProductById(id);
+        if (p != null && p.getModelImagePath() != null) {
+            p.setModelImagePath("/product-model/image/" + p.getModelId());
         }
+        return p;
     }
-
-    @PutMapping("/{modelId}")
-    public ResponseEntity<String> updateProductModel(@PathVariable int modelId, @RequestBody ProductModel productModel) {
-        try {
-            productModel.setModelId(modelId);
-            productService.updateProduct(productModel);
-            return ResponseEntity.ok("Product model updated successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to update product model: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{modelId}")
-    public ResponseEntity<String> deleteProductModel(@PathVariable int modelId) {
-        try {
-            productService.deleteProduct(modelId);
-            return ResponseEntity.ok("Product model deleted successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to delete product model: " + e.getMessage());
-        }
-    }
-
-    // ==================== Upload Product Model with Image ====================
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadProductModel(
-            @RequestParam int modelId,
+    public ResponseEntity<String> uploadOrUpdateProductModel(
             @RequestParam int recipeId,
             @RequestParam String modelName,
             @RequestParam BigDecimal price,
@@ -85,12 +66,13 @@ public class ProductModelController {
             @RequestParam("file") MultipartFile file
     ) {
         try {
-            productService.saveProductModelWithImage(recipeId, modelName, price, description, file);
-            return ResponseEntity.ok("Product model uploaded successfully with image!");
+            productService.upsertProductModelWithImage(recipeId, modelName, price, description, file);
+            return ResponseEntity.ok("Product model saved successfully!");
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Failed to upload product model: " + e.getMessage());
+            return ResponseEntity.status(400).body("Failed to save product model: " + e.getMessage());
         }
     }
+
 
     @PutMapping("/upload")
     public ResponseEntity<String> updateProductModelWithImage(
@@ -109,22 +91,34 @@ public class ProductModelController {
         }
     }
 
-    // ==================== Image Endpoints ====================
-
+//    getProductModelImage
     @GetMapping("/image/{modelId}")
     public ResponseEntity<byte[]> getProductModelImage(@PathVariable int modelId) {
         try {
             ProductModel productModel = productService.getProductById(modelId);
-            if (productModel == null || productModel.getModelImage() == null) {
+            if (productModel == null || productModel.getModelImagePath() == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
                         .body("Product model image not found".getBytes());
             }
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_PNG);
+            File imgFile = new File(productModel.getModelImagePath());
+            if (!imgFile.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .header(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8")
+                        .body("Image file not found on server".getBytes());
+            }
 
-            return new ResponseEntity<>(productModel.getModelImage(), headers, HttpStatus.OK);
+            byte[] imageBytes = Files.readAllBytes(imgFile.toPath());
+
+            HttpHeaders headers = new HttpHeaders();
+            String ext = productModel.getModelImagePath().substring(productModel.getModelImagePath().lastIndexOf(".") + 1).toLowerCase();
+            if ("png".equals(ext)) headers.setContentType(MediaType.IMAGE_PNG);
+            else if ("jpg".equals(ext) || "jpeg".equals(ext)) headers.setContentType(MediaType.IMAGE_JPEG);
+            else headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+
         } catch (Exception e) {
             e.printStackTrace();
             String errorMsg = "Error retrieving product model image: " + e.getMessage();
@@ -133,4 +127,5 @@ public class ProductModelController {
                     .body(errorMsg.getBytes());
         }
     }
+
 }

@@ -1,35 +1,27 @@
 package sa3.fijiimpulse.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import jakarta.persistence.Column;
-
 import java.math.BigDecimal;
 
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
 public class ProductModel {
     private int modelId;
     private int recipeId;
     private String modelName;
     private BigDecimal price;
 
-    @Column(name = "Model_image")
-    private byte[] modelImage; // ใช้ byte[] เพื่อเก็บภาพใน DB
+    // เปลี่ยนจาก byte[] เป็น String สำหรับเก็บชื่อไฟล์หรือ path
+    private String modelImagePath;
 
     private String description;
 
     public ProductModel() {
     }
 
-    public ProductModel(int modelId, int recipeId, String modelName, BigDecimal price, byte[] modelImage, String description) {
+    public ProductModel(int modelId, int recipeId, String modelName, BigDecimal price, String modelImagePath, String description) {
         this.modelId = modelId;
         this.recipeId = recipeId;
         this.modelName = modelName;
         this.price = price;
-        this.modelImage = modelImage;
+        this.modelImagePath = modelImagePath;
         this.description = description;
     }
 
@@ -65,12 +57,12 @@ public class ProductModel {
         this.price = price;
     }
 
-    public byte[] getModelImage() {
-        return modelImage;
+    public String getModelImagePath() {
+        return modelImagePath;
     }
 
-    public void setModelImage(byte[] modelImage) {
-        this.modelImage = modelImage;
+    public void setModelImagePath(String modelImagePath) {
+        this.modelImagePath = modelImagePath;
     }
 
     public String getDescription() {
@@ -88,10 +80,8 @@ public class ProductModel {
                 ", recipeId=" + recipeId +
                 ", modelName='" + modelName + '\'' +
                 ", price=" + price +
-                ", modelImage=" + (modelImage != null ? "[BLOB data]" : "null") +
+                ", modelImagePath='" + modelImagePath + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }
 }
-
-

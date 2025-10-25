@@ -111,22 +111,33 @@ public class PaymentService {
 //
 //        paymentDAO.update(payment);
 //    }
-    public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
-        byte[] compressedBytes = null;
 
-        if (file != null && !file.isEmpty()) {
-            // บีบอัดและปรับขนาดให้ไม่เกิน 1MB
-            compressedBytes = ImageUtils.compressAndResizeImage(file, 1024 * 1024); // 1MB
+    public void savePayment(long orderId, BigDecimal totalAmount, Timestamp paymentDate, MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IOException("Payment receipt file is required.");
+        }
+
+        // ✅ เริ่มบีบอัดที่ 1 MB
+        byte[] compressedImage = ImageUtils.compressAndResizeImage(file, 1024 * 1024);
+
+        // ✅ ถ้ายังเกิน 1 MB ให้ลดคุณภาพซ้ำ
+        if (compressedImage.length > 1024 * 1024) {
+            float quality = 0.8f;
+            while (compressedImage.length > 1024 * 1024 && quality > 0.1f) {
+                compressedImage = ImageUtils.compressAndResizeImage(file, (int) (1024 * 1024 * quality));
+                quality -= 0.05f;
+            }
         }
 
         Payment payment = new Payment();
         payment.setOrderId(orderId);
         payment.setTotalAmount(totalAmount);
         payment.setPaymentDate(paymentDate);
-        payment.setPaymentReceipt(compressedBytes);
+        payment.setPaymentReceipt(compressedImage);
 
         paymentDAO.update(payment);
     }
+
 
 
 }
