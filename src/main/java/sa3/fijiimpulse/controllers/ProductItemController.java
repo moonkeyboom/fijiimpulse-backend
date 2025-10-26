@@ -72,8 +72,10 @@ public class ProductItemController {
     public String adjustProductItemsForUser(
             @RequestParam int userId,
             @RequestParam int modelId,
-            @RequestParam int quantity) {
-        productItemService.adjustProductItemsForUser(modelId, userId, quantity);
+            @RequestParam int quantity,
+            @RequestBody Map<String, String> address) {
+        System.out.println(address);
+        productItemService.adjustProductItemsForUser(modelId, userId, quantity, address);
         return "Adjusted ProductItems for User ID " + userId +
                 " (Model ID: " + modelId + ", Desired Quantity: " + quantity + ")";
     }

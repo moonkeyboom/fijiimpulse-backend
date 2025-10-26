@@ -2,6 +2,7 @@ package sa3.fijiimpulse.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import sa3.fijiimpulse.dao.OrderDAO;
 import sa3.fijiimpulse.dao.ProductItemDAO;
 import sa3.fijiimpulse.entity.ProductItem;
@@ -10,6 +11,7 @@ import sa3.fijiimpulse.service.enums.OrderStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -99,11 +101,16 @@ public class ProductItemService {
         }
     }
 
+    private String safeGet(Map<String, String> map, String key) {
+        String value = map.get(key);
+        return (value == null || value.isBlank()) ? "" : value;
+    }
 
 //    ปุ่มเพิ่มสินค้าลงตระกร้า
-    public void adjustProductItemsForUser(int modelId, int userId, int quantity) {
+    public void adjustProductItemsForUser(int modelId, int userId, int quantity, Map<String, String> address) {
         // 1. ดึง orders ของ user
         List<Order> userOrders = orderService.getOrdersByUserId(userId);
+        System.out.println(address);
 
         // 2. หา order ที่ยังอยู่ในสถานะ PAYMENT_EVIDENCE_PENDING
         Order targetOrder = null;
@@ -120,8 +127,16 @@ public class ProductItemService {
             Order newOrder = new Order();
             newOrder.setUserId(userId);
             newOrder.setOrderStatus(OrderStatus.PAYMENT_EVIDENCE_PENDING.getThaiTranslation());
+            newOrder.setRecipientName(safeGet(address, "name"));
+            newOrder.setPhoneNumber(safeGet(address, "tel"));
+            newOrder.setDistrict(safeGet(address, "district"));
+            newOrder.setHouseAddress(safeGet(address, "houseAddress"));
+            newOrder.setSubDistrict(safeGet(address, "subDistrict"));
+            newOrder.setStreetName(safeGet(address, "street"));
+            newOrder.setProvince(safeGet(address, "province"));
+            newOrder.setPostalCode(safeGet(address, "postalCode"));
             newOrder.setOrderDate(new java.sql.Timestamp(System.currentTimeMillis()));
-
+            System.out.println(newOrder);
             int result = orderService.createOrder(newOrder);
 
             if (result > 0) {
