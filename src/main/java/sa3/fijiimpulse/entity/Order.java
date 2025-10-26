@@ -41,6 +41,9 @@ public class Order {
         this.grandTotalPrice = grandTotalPrice;
     }
 
+    public Order() {
+    }
+
     public long getOrderId() {
         return orderId;
     }

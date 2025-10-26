@@ -142,8 +142,13 @@ public class OrderController {
 
     //======
     // ดึง ProductItem ทั้งหมดของ Order
-    @GetMapping("/{orderId}/items")
+    @GetMapping("/order/{orderId}/items")
     public List<ProductItem> getProductItemsByOrderId(@PathVariable long orderId) {
         return orderService.getProductItemsByOrderId(orderId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Order> getOrderByUserId(@PathVariable int userId) {
+        return orderService.getOrdersByUserId(userId);
     }
 }

@@ -14,7 +14,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/product-items")
 public class ProductItemController {
-
     @Autowired
     private ProductItemService productItemService;
     @Autowired
@@ -57,17 +56,7 @@ public class ProductItemController {
         return "ProductItem deleted successfully!";
     }
 
-//    @PostMapping("/adjust-items")
-//    public String assignToOrder(@RequestParam int modelId,
-//                                @RequestParam long orderId,
-//                                @RequestParam int quantity) {
-//        productItemService.adjustProductItemsForOrder(modelId, orderId, quantity);
-//        return quantity + " ProductItems assigned to Order " + orderId;
-//    }
-
-
-
-    @PostMapping("/adjust-items")
+    @PostMapping("/adjust-order-items")
     public String adjustProductItemsForOrder(
             @RequestParam long orderId,
             @RequestParam int modelId,
@@ -78,6 +67,16 @@ public class ProductItemController {
     }
 //    POST http://localhost:8080/product-items/adjust-items?orderId=10&modelId=2&quantity=2
 //    GET http://localhost:8081/orders/10/items
+
+    @PostMapping("/adjust-user-items")
+    public String adjustProductItemsForUser(
+            @RequestParam int userId,
+            @RequestParam int modelId,
+            @RequestParam int quantity) {
+        productItemService.adjustProductItemsForUser(modelId, userId, quantity);
+        return "Adjusted ProductItems for User ID " + userId +
+                " (Model ID: " + modelId + ", Desired Quantity: " + quantity + ")";
+    }
 
     @PostMapping("/create-multiple")
     public void createMultipleProductItems(@RequestBody Map<Integer, Integer> productItems) {
@@ -95,5 +94,11 @@ public class ProductItemController {
                 }
             }
         }
+    }
+
+    // ✅ ดึง ProductItem ทั้งหมดของ User (รวมทุก Order)
+    @GetMapping("/user/{userId}")
+    public List<ProductItem> getProductItemsByUserId(@PathVariable int userId) {
+        return productItemService.getProductItemsByUserId(userId);
     }
 }
