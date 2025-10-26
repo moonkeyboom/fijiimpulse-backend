@@ -25,6 +25,25 @@ public class OrderController {
         return orderService.getAllOrders();
     }
 
+    // ==================== Use Case: Create Order ====================
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createOrder(@RequestBody Order order) {
+        try {
+            int result = orderService.createOrder(order);
+
+            if (result > 0) {
+                // ดึง Order ที่สร้างใหม่กลับมา (เพื่อให้ได้ orderId)
+                Order createdOrder = orderService.getOrderById(order.getOrderId());
+                return ResponseEntity.ok(createdOrder);
+            } else {
+                return ResponseEntity.status(500).body("สร้าง Order ไม่สำเร็จ");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("เกิดข้อผิดพลาด: " + e.getMessage());
+        }
+    }
+
     // ==================== Use Case 2M: ตรวจสอบและยืนยันหลักฐานการชำระเงิน ====================
     
     @GetMapping("/pending-payment")
@@ -64,6 +83,52 @@ public class OrderController {
             return ResponseEntity.ok("ปฏิเสธหลักฐานการชำระเงินสำเร็จ");
         } else {
             return ResponseEntity.status(500).body("ปฏิเสธไม่สำเร็จ");
+        }
+    }
+
+    // ==================== Use Case: Production & Shipping Flow ====================
+
+    @PostMapping("/{orderId}/mark-produced")
+    public ResponseEntity<String> markAsProduced(@PathVariable long orderId) {
+        boolean success = orderService.markAsProduced(orderId);
+
+        if (success) {
+            return ResponseEntity.ok("ทำเครื่องหมายว่าผลิตสำเร็จแล้ว");
+        } else {
+            return ResponseEntity.status(500).body("อัปเดตสถานะไม่สำเร็จ");
+        }
+    }
+
+    @PostMapping("/{orderId}/prepare-shipping")
+    public ResponseEntity<String> prepareShipping(@PathVariable long orderId) {
+        boolean success = orderService.prepareShipping(orderId);
+
+        if (success) {
+            return ResponseEntity.ok("เตรียมจัดส่งสินค้าสำเร็จ");
+        } else {
+            return ResponseEntity.status(500).body("อัปเดตสถานะไม่สำเร็จ");
+        }
+    }
+
+    @PostMapping("/{orderId}/ship")
+    public ResponseEntity<String> shipOrder(@PathVariable long orderId) {
+        boolean success = orderService.shipOrder(orderId);
+
+        if (success) {
+            return ResponseEntity.ok("จัดส่งสินค้าสำเร็จ");
+        } else {
+            return ResponseEntity.status(500).body("อัปเดตสถานะไม่สำเร็จ");
+        }
+    }
+
+    @PostMapping("/{orderId}/confirm-delivery")
+    public ResponseEntity<String> confirmDelivery(@PathVariable long orderId) {
+        boolean success = orderService.markAsDelivered(orderId);
+
+        if (success) {
+            return ResponseEntity.ok("ยืนยันการรับสินค้าสำเร็จ");
+        } else {
+            return ResponseEntity.status(500).body("อัปเดตสถานะไม่สำเร็จ");
         }
     }
 
