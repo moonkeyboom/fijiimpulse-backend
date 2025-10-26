@@ -27,7 +27,6 @@ public class PaymentService {
         this.paymentDAO = paymentDAO;
     }
 
-
     // ดึง Payment ทั้งหมด
     public List<Payment> getAllPayments() {
         return paymentDAO.findAll();
