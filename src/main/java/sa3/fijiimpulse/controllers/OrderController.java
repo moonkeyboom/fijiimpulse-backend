@@ -173,6 +173,60 @@ public class OrderController {
         return orderService.getOrderDetailsByUserId(userId);
     }
 
+    /**
+     * Get specific order for a user
+     * @param userId User ID
+     * @param orderId Order ID
+     * @return Order details for the specific user order
+     */
+    @GetMapping("/user/{userId}/order/{orderId}")
+    public ResponseEntity<Order> getUserOrderById(@PathVariable int userId, @PathVariable long orderId) {
+        try {
+            Order order = orderService.getOrderById(orderId);
+
+            // Verify that the order belongs to the specified user
+            if (order == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (order.getUserId() != userId) {
+                return ResponseEntity.status(403).body(null); // Forbidden - order doesn't belong to user
+            }
+
+            return ResponseEntity.ok(order);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    /**
+     * Get product items for a specific user order
+     * @param userId User ID
+     * @param orderId Order ID
+     * @return List of product items for the specific user order
+     */
+    @GetMapping("/user/{userId}/order/{orderId}/items")
+    public ResponseEntity<List<ProductItem>> getProductItemsForUserOrder(@PathVariable int userId, @PathVariable long orderId) {
+        try {
+            // First verify that the order belongs to the user
+            Order order = orderService.getOrderById(orderId);
+
+            if (order == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (order.getUserId() != userId) {
+                return ResponseEntity.status(403).body(null); // Forbidden - order doesn't belong to user
+            }
+
+            // Get product items for the order
+            List<ProductItem> productItems = orderService.getProductItemsByOrderId(orderId);
+            return ResponseEntity.ok(productItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
     // ==================== Address Management Endpoints ====================
 
     @PutMapping("/{orderId}/address")
