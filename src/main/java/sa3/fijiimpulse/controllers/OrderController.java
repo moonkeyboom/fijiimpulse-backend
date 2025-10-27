@@ -151,4 +151,60 @@ public class OrderController {
     public List<Order> getOrderByUserId(@PathVariable int userId) {
         return orderService.getOrdersByUserId(userId);
     }
+
+    // ==================== Address Management Endpoints ====================
+
+    @PutMapping("/{orderId}/address")
+    public ResponseEntity<?> updateOrderAddress(@PathVariable long orderId,
+                                          @RequestParam String recipientName,
+                                          @RequestParam String phoneNumber,
+                                          @RequestParam String houseAddress,
+                                          @RequestParam String subDistrict,
+                                          @RequestParam String district,
+                                          @RequestParam String streetName,
+                                          @RequestParam String province,
+                                          @RequestParam String postalCode) {
+        try {
+            boolean success = orderService.updateOrderAddress(orderId, recipientName, phoneNumber,
+                                                         houseAddress, subDistrict, district,
+                                                         streetName, province, postalCode);
+            if (success) {
+                return ResponseEntity.ok("อัปเดตที่อยู่จัดส่งสำเร็จ");
+            } else {
+                return ResponseEntity.status(500).body("อัปเดตที่อยู่จัดส่งไม่สำเร็จ");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("ข้อผิดพลาด: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("เกิดข้อผิดพลาด: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{orderId}/address/partial")
+    public ResponseEntity<?> updatePartialOrderAddress(@PathVariable long orderId,
+                                                 @RequestBody Map<String, String> addressUpdates) {
+        try {
+            String recipientName = addressUpdates.get("recipientName");
+            String phoneNumber = addressUpdates.get("phoneNumber");
+            String houseAddress = addressUpdates.get("houseAddress");
+            String subDistrict = addressUpdates.get("subDistrict");
+            String district = addressUpdates.get("district");
+            String streetName = addressUpdates.get("streetName");
+            String province = addressUpdates.get("province");
+            String postalCode = addressUpdates.get("postalCode");
+
+            boolean success = orderService.updatePartialOrderAddress(orderId, recipientName, phoneNumber,
+                                                             houseAddress, subDistrict, district,
+                                                             streetName, province, postalCode);
+            if (success) {
+                return ResponseEntity.ok("อัปเดตที่อยู่จัดส่งบางส่วนสำเร็จ");
+            } else {
+                return ResponseEntity.status(500).body("อัปเดตที่อยู่จัดส่งบางส่วนไม่สำเร็จ");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("ข้อผิดพลาด: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("เกิดข้อผิดพลาด: " + e.getMessage());
+        }
+    }
 }

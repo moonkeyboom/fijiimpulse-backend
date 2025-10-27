@@ -6,21 +6,12 @@ import sa3.fijiimpulse.dao.OrderDAO;
 import sa3.fijiimpulse.entity.Payment;
 import sa3.fijiimpulse.service.enums.OrderStatus;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
-import sa3.fijiimpulse.utils.ImageUtils;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -98,6 +89,6 @@ public class PaymentService {
         else paymentDAO.insert(payment);
 
         // อัปเดตสถานะ Order เป็น "รอตรวจสอบหลักฐานการชำระเงิน"
-        orderDAO.updateOrderStatus(orderId, OrderStatus.PENDING_RECEIPT_VERIFICATION.getThaiTranslation());
+        orderDAO.updateOrderStatus(orderId, OrderStatus.WAITING_VERIFICATION.getThaiTranslation());
     }
 }
