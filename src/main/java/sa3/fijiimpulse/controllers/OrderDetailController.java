@@ -38,6 +38,35 @@ public class OrderDetailController {
         return orderDetailService.getOrderDetailsByOrderId(orderId);
     }
 
+    /**
+     * Add quantity to order detail - Single endpoint for frontend
+     *
+     * Business Logic:
+     * 1. Find user's order with WAITING_PAYMENT status
+     * 2. If exists, add/update order detail for the model
+     * 3. If not exists, create new order with WAITING_PAYMENT status and add order detail
+     *
+     * @param userId User ID
+     * @param modelId Product model ID
+     * @param quantity Quantity to add
+     * @return Response with result message
+     */
+    //    ปุ่ม เพิ่มสินค้า
+    @PostMapping("/adjust-to-waiting-order")
+    public ResponseEntity<?> addQuantityToWaitingOrder(
+            @RequestParam int userId,
+            @RequestParam int modelId,
+            @RequestParam int quantity) {
+        try {
+            String result = orderDetailService.adjustQuantityToWaitingOrder(userId, modelId, quantity);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("ข้อผิดพลาด: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("เกิดข้อผิดพลาด: " + e.getMessage());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> createOrderDetail(@RequestBody OrderDetail orderDetail) {
         try {

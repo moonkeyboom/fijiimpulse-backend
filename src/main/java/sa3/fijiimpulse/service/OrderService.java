@@ -85,6 +85,46 @@ public class OrderService {
         return orderDAO.findByUserId(userId);
     }
 
+    /**
+     * Get all product items for a specific user
+     * @param userId User ID
+     * @return List of all product items belonging to the user
+     */
+    public List<ProductItem> getProductItemsByUserId(int userId) {
+        // Get all orders for the user
+        List<Order> userOrders = orderDAO.findByUserId(userId);
+
+        // Collect all product items from all user's orders
+        List<ProductItem> allUserProductItems = new ArrayList<>();
+
+        for (Order order : userOrders) {
+            List<ProductItem> productItems = productItemDAO.findByOrderId(order.getOrderId());
+            allUserProductItems.addAll(productItems);
+        }
+
+        return allUserProductItems;
+    }
+
+    /**
+     * Get all order details for a specific user
+     * @param userId User ID
+     * @return List of all order details belonging to the user
+     */
+    public List<OrderDetail> getOrderDetailsByUserId(int userId) {
+        // Get all orders for the user
+        List<Order> userOrders = orderDAO.findByUserId(userId);
+
+        // Collect all order details from all user's orders
+        List<OrderDetail> allUserOrderDetails = new ArrayList<>();
+
+        for (Order order : userOrders) {
+            List<OrderDetail> orderDetails = orderDetailDAO.findByOrderId(order.getOrderId());
+            allUserOrderDetails.addAll(orderDetails);
+        }
+
+        return allUserOrderDetails;
+    }
+
     // ==================== Use Case 2M: ตรวจสอบและยืนยันหลักฐานการชำระเงิน ====================
 
     public List<Order> getPendingPaymentOrders() {

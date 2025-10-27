@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import sa3.fijiimpulse.entity.Order;
 import sa3.fijiimpulse.entity.Payment;
 import sa3.fijiimpulse.entity.ProductItem;
+import sa3.fijiimpulse.entity.OrderDetail;
 import sa3.fijiimpulse.service.OrderService;
 
 import java.util.List;
@@ -150,6 +151,26 @@ public class OrderController {
     @GetMapping("/user/{userId}")
     public List<Order> getOrderByUserId(@PathVariable int userId) {
         return orderService.getOrdersByUserId(userId);
+    }
+
+    /**
+     * Get all product items for a specific user
+     * @param userId User ID
+     * @return List of all product items belonging to the user
+     */
+    @GetMapping("/user/{userId}/items")
+    public List<ProductItem> getProductItemsByUserId(@PathVariable int userId) {
+        return orderService.getProductItemsByUserId(userId);
+    }
+
+    /**
+     * Get all order details for a specific user
+     * @param userId User ID
+     * @return List of all order details belonging to the user
+     */
+    @GetMapping("/user/{userId}/order-details")
+    public List<OrderDetail> getOrderDetailsByUserId(@PathVariable int userId) {
+        return orderService.getOrderDetailsByUserId(userId);
     }
 
     // ==================== Address Management Endpoints ====================

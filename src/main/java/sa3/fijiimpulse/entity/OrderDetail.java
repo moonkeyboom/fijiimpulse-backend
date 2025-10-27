@@ -69,6 +69,8 @@ public class OrderDetail {
         this.totalPrice = totalPrice;
     }
 
+
+
     @Override
     public String toString() {
         return "OrderDetail{" +
