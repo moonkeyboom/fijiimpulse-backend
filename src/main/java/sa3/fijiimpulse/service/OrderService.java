@@ -141,7 +141,9 @@ public class OrderService {
             // Check ProductItem availability before approving
             Map<String, Object> availability = checkProductItemAvailabilityForOrder(orderId);
             if (!(Boolean) availability.get("isAvailable")) {
-                throw new IllegalArgumentException("Cannot approve payment. Not enough ProductItems available.");
+                // Not enough ProductItems available, create missing ones automatically
+                createMissingProductItemsForOrder(orderId, availability);
+                System.out.println("Created missing ProductItems for order " + orderId + " due to insufficient stock");
             }
 
             // Update order status to PAYMENT_CONFIRMED
@@ -150,7 +152,7 @@ public class OrderService {
             if (result > 0) {
                 // Generate ProductItems for the order based on OrderDetail quantities
                 List<ProductItem> createdItems = generateProductItemsAfterPaymentApproval(orderId);
-                System.out.println("Created " + createdItems.size() + " ProductItems for order " + orderId);
+                System.out.println("Assigned " + createdItems.size() + " ProductItems for order " + orderId);
             }
 
             return result > 0;
@@ -446,6 +448,46 @@ public class OrderService {
         } catch (Exception e) {
             throw new RuntimeException("Error checking ProductItem availability: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Create missing ProductItems for an order when there's insufficient stock
+     * This method is called during payment approval to automatically create needed items
+     */
+    private void createMissingProductItemsForOrder(long orderId, Map<String, Object> availability) {
+        try {
+            List<Map<String, Object>> orderDetails = (List<Map<String, Object>>) availability.get("orderDetails");
+
+            for (Map<String, Object> detail : orderDetails) {
+                int shortage = (Integer) detail.get("shortage");
+                int modelId = (Integer) detail.get("modelId");
+
+                if (shortage > 0) {
+                    // Create missing ProductItems for this model
+                    for (int i = 0; i < shortage; i++) {
+                        ProductItem newItem = new ProductItem();
+                        newItem.setModelId(modelId);
+                        newItem.setOrderId(null); // Will be assigned later
+                        newItem.setSerialNo(generateSerialNumber(modelId));
+
+                        productItemDAO.save(newItem);
+                        System.out.println("Created new ProductItem for model " + modelId + " with serial " + newItem.getSerialNo());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating missing ProductItems: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Generate a unique serial number for a ProductItem
+     */
+    private String generateSerialNumber(int modelId) {
+        // Generate serial number with format: SN{modelId}{timestamp}{random}
+        long timestamp = System.currentTimeMillis();
+        int random = (int) (Math.random() * 1000);
+        return "SN" + modelId + timestamp + random;
     }
 
     /**
