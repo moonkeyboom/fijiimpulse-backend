@@ -174,4 +174,8 @@ public class ProductItemService {
 
         return allItems;
     }
+
+    public List<Map<String, Object>> getProductListFromOrderId(int orderId) {
+        return orderDAO.findItemsListFromOrderId(orderId);
+    }
 }

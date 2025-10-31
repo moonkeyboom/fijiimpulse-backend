@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import sa3.fijiimpulse.entity.Order;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class OrderDAO {
@@ -136,5 +137,22 @@ public class OrderDAO {
         String sql = "UPDATE ORDERS SET Order_status=? WHERE Order_id=?";
         return jdbcTemplate.update(sql, newStatus, orderId);
     }
+
+    public List<Map<String, Object>> findItemsListFromOrderId(long orderId) {
+        String sql = """
+        SELECT 
+            pm.model_name,
+            pm.model_image,
+            COUNT(pi.model_id) AS total_count,
+            pm.price
+        FROM PRODUCT_ITEM pi
+        JOIN PRODUCT_MODEL pm ON pi.model_id = pm.model_id
+        WHERE pi.order_id = ?
+        GROUP BY pm.model_name, pm.model_image, pm.price
+    """;
+
+        return jdbcTemplate.queryForList(sql, orderId);
+    }
+
 
 }

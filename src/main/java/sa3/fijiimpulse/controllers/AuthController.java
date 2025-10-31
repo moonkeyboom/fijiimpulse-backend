@@ -25,6 +25,19 @@ public class AuthController {
         return ResponseEntity.ok("Register Successfully");
     }
 
+    //temp
+    @PostMapping("/register/admin")
+    private ResponseEntity<?> registerAdmin(@RequestBody Map<String, String> req) {
+        boolean success = userService.registerAdmin(
+                req.get("username"),
+                req.get("email"),
+                req.get("password")
+        );
+        if (!success) return(ResponseEntity.badRequest().body("Email already exists"));
+        return ResponseEntity.ok("Register Successfully");
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> req, HttpSession session) {
         User user = userService.login(req.get("username"), req.get("password"));
