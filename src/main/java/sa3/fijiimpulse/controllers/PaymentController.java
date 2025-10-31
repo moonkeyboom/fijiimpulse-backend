@@ -66,6 +66,8 @@ public class PaymentController {
         return "Payment deleted successfully!";
     }
 
+
+//    ใช้ตัวนี้
     @PostMapping("/upload")
     public String uploadPayment(
             @RequestParam long orderId,
@@ -122,7 +124,7 @@ public class PaymentController {
         return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
     }
 
-    @GetMapping("/view/{orderId}")
+    @GetMapping("/order/{orderId}/view")
     public ResponseEntity<byte[]> viewReceipt(@PathVariable long orderId) throws IOException {
         Payment payment = paymentService.getPaymentByOrderId(orderId);
         if (payment == null || payment.getPaymentReceipt() == null) return ResponseEntity.notFound().build();

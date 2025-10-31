@@ -1,14 +1,14 @@
 package sa3.fijiimpulse.service.enums;
 
 public enum OrderStatus {
- PAYMENT_EVIDENCE_PENDING("รอชำระเงินและอัปโหลดหลักฐานการชำระเงิน"),
- PAYMENT_EVIDENCE_PENDING_AGAIN("หลักฐานการชำระเงินถูกปฏิเสธ รอชำระเงินและอัปโหลดหลักฐานการชำระเงินอีกครั้ง"),
- PENDING_RECEIPT_VERIFICATION("รอตรวจสอบหลักฐานการชำระเงิน"),
- PAYMENT_APPROVED("ได้รับการยืนยันการชำระเงิน"),
- PRODUCED("สินค้าถูกผลิต"),
- READY_TO_SHIP("รอจัดส่งสินค้า"),
- SHIPPED("กำลังจัดส่ง"),
- DELIVERED("จัดส่งสำเร็จ");
+ WAITING_PAYMENT("รอชำระเงิน"),
+ WAITING_VERIFICATION("รอตรวจสอบหลักฐาน"),
+ PAYMENT_REJECTED("หลักฐานการชำระเงินถูกปฏิเสธ"),
+ PAYMENT_CONFIRMED("ยืนยันการชำระแล้ว"),
+ PRODUCTION_COMPLETE("สินค้าผลิตแล้ว"),
+ WAITING_SHIPMENT("รอจัดส่ง"),
+ SHIPPEDSHIPPING_IN_PROGRESS("กำลังจัดส่ง"),
+ SHIPPED("จัดส่งแล้ว");
 
  private final String thaiTranslation;
 
