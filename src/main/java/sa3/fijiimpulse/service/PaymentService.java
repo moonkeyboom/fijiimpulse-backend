@@ -45,6 +45,9 @@ public class PaymentService {
     public Payment getPaymentByOrderId(long orderId) {
         return paymentDAO.findByOrderId(orderId);
     }
+    public Payment getPaymentReceiptByOrderId(long orderId) {
+        return paymentDAO.findReceiptByOrderId(orderId);
+    }
 
 
     // เพิ่ม Payment ใหม่
