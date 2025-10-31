@@ -87,6 +87,16 @@ public class OrderController {
         }
     }
 
+    @PostMapping("/{orderId}/recheck")
+    public ResponseEntity<String> markAsRecheck(@PathVariable long orderId) {
+        boolean success = orderService.markAsRecheck(orderId);
+        if (success) {
+            return ResponseEntity.ok("ทำเครื่องให้ตรวจสอบอีกรอบ");
+        } else {
+            return ResponseEntity.status(500).body("อัปเดตสถานะไม่สำเร็จ");
+        }
+    }
+
     // ==================== Use Case: Production & Shipping Flow ====================
 
     @PostMapping("/{orderId}/mark-produced")

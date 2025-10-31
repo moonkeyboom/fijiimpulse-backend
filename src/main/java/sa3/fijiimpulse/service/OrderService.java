@@ -167,6 +167,11 @@ public class OrderService {
         return result > 0;
     }
 
+    public boolean markAsRecheck(long orderId) {
+        int result = orderDAO.updateOrderStatus(orderId, OrderStatus.WAITING_RECHECK.getThaiTranslation());
+        return result > 0;
+    }
+
     // ==================== Use Case: Production & Shipping Flow ====================
 
     /**

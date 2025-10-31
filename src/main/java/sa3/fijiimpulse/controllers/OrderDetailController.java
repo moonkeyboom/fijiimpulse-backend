@@ -9,6 +9,7 @@ import sa3.fijiimpulse.service.OrderDetailService;
 import sa3.fijiimpulse.service.OrderService;
 import sa3.fijiimpulse.service.ProductItemService;
 import sa3.fijiimpulse.service.ProductModelService;
+import sa3.fijiimpulse.service.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -52,8 +53,8 @@ public class OrderDetailController {
         List<Order> orders = orderService.getOrdersByUserId(userId);
         long id = -1;
         for (Order o : orders) {
-            if(o.getOrderStatus().equals("รอชำระเงิน")) {
-                id  = o.getOrderId();
+            if(o.getOrderStatus().equals(OrderStatus.WAITING_PAYMENT.getThaiTranslation())) {
+                id = o.getOrderId();
             }
         }
         List<OrderDetail> orderDetails = orderDetailService.getOrderDetailsByOrderId(id);
