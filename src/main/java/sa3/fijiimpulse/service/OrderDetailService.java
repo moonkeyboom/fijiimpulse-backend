@@ -179,6 +179,125 @@ public class OrderDetailService {
         }
     }
 
+
+    public String addQuantityToWaitingOrder(int userId, int modelId, int quantity) {
+        // Validate inputs
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+
+        // Validate model exists
+        ProductModel productModel = productModelDAO.findById(modelId);
+        if (productModel == null) {
+            throw new IllegalArgumentException("Product model not found");
+        }
+
+        // Find user's order with WAITING_PAYMENT status
+        List<Order> userOrders = orderDAO.findByUserId(userId);
+        Order waitingOrder = null;
+
+        for (Order order : userOrders) {
+            if (OrderStatus.WAITING_PAYMENT.getThaiTranslation().equals(order.getOrderStatus())) {
+                waitingOrder = order;
+                break;
+            }
+        }
+
+        Long orderId = null;
+        boolean isNewOrder = false;
+
+        if (waitingOrder != null) {
+            // Use existing waiting order
+            orderId = waitingOrder.getOrderId();
+        } else {
+            // Create new order with WAITING_PAYMENT status
+            Order newOrder = new Order();
+            newOrder.setUserId(userId);
+            newOrder.setOrderDate(new java.sql.Timestamp(System.currentTimeMillis()));
+            newOrder.setOrderStatus(OrderStatus.WAITING_PAYMENT.getThaiTranslation());
+            newOrder.setGrandTotalPrice(BigDecimal.ZERO);
+            // Set default address values - these should be updated by user later
+            newOrder.setRecipientName("Pending");
+            newOrder.setPhoneNumber("Pending");
+            newOrder.setHouseAddress("Pending");
+            newOrder.setSubDistrict("Pending");
+            newOrder.setDistrict("Pending");
+            newOrder.setStreetName("Pending");
+            newOrder.setProvince("Pending");
+            newOrder.setPostalCode("Pending");
+
+            int result = orderDAO.insert(newOrder);
+            if (result <= 0) {
+                throw new RuntimeException("Failed to create new order");
+            }
+
+            // Get the newly created order ID
+            List<Order> updatedUserOrders = orderDAO.findByUserId(userId);
+            for (Order order : updatedUserOrders) {
+                if (OrderStatus.WAITING_PAYMENT.getThaiTranslation().equals(order.getOrderStatus())) {
+                    orderId = order.getOrderId();
+                    break;
+                }
+            }
+
+            if (orderId == null) {
+                throw new RuntimeException("Failed to retrieve newly created order");
+            }
+
+            isNewOrder = true;
+        }
+
+        // Check if order detail already exists for this model
+        List<OrderDetail> existingDetails = orderDetailDAO.findByOrderId(orderId);
+        OrderDetail existingDetail = null;
+
+        for (OrderDetail detail : existingDetails) {
+            if (detail.getModelId() == modelId) {
+                existingDetail = detail;
+                break;
+            }
+        }
+
+        if (existingDetail != null) {
+            // Update existing order detail quantity
+            int newQuantity = existingDetail.getOrderQuantity() + quantity;
+//            int newQuantity = quantity;
+            existingDetail.setOrderQuantity(newQuantity);
+
+            // Recalculate price
+            BigDecimal newPrice = productModel.getPrice().multiply(BigDecimal.valueOf(newQuantity));
+            existingDetail.setTotalPrice(newPrice);
+
+            int updateResult = orderDetailDAO.update(existingDetail);
+            if (updateResult <= 0) {
+                throw new RuntimeException("Failed to update order detail");
+            }
+
+            return "Updated quantity for existing order. New quantity: " + newQuantity;
+        } else {
+            // Create new order detail
+            OrderDetail newDetail = new OrderDetail();
+            newDetail.setOrderId(orderId);
+            newDetail.setModelId(modelId);
+            newDetail.setOrderQuantity(quantity);
+
+            // Calculate price
+            BigDecimal calculatedPrice = productModel.getPrice().multiply(BigDecimal.valueOf(quantity));
+            newDetail.setTotalPrice(calculatedPrice);
+
+            int insertResult = orderDetailDAO.insert(newDetail);
+            if (insertResult <= 0) {
+                throw new RuntimeException("Failed to create order detail");
+            }
+
+            if (isNewOrder) {
+                return "Created new order and added " + quantity + " items to order " + orderId;
+            } else {
+                return "Added " + quantity + " items to existing order " + orderId;
+            }
+        }
+    }
+
     public int deleteOrderDetailsByOrderId(Long orderId) {
         return orderDetailDAO.deleteByOrderId(orderId);
     }

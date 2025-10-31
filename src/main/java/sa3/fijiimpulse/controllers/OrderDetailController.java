@@ -79,14 +79,30 @@ public class OrderDetailController {
      * @param quantity Quantity to add
      * @return Response with result message
      */
-    //    ปุ่ม เพิ่มสินค้า
+    //    ปรับจำนวนสินค้าในตะหร้า
     @PostMapping("/adjust-to-waiting-order")
-    public ResponseEntity<?> addQuantityToWaitingOrder(
+    public ResponseEntity<?> adjustQuantityToWaitingOrder(
             @RequestParam int userId,
             @RequestParam int modelId,
             @RequestParam int quantity) {
         try {
             String result = orderDetailService.adjustQuantityToWaitingOrder(userId, modelId, quantity);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("ข้อผิดพลาด: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("เกิดข้อผิดพลาด: " + e.getMessage());
+        }
+    }
+
+    //เพิ่มสินค้าลงตะกร้า
+    @PostMapping("/add-to-waiting-order")
+    public ResponseEntity<?> addQuantityToWaitingOrder(
+            @RequestParam int userId,
+            @RequestParam int modelId,
+            @RequestParam int quantity) {
+        try {
+            String result = orderDetailService.addQuantityToWaitingOrder(userId, modelId, quantity);
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("ข้อผิดพลาด: " + e.getMessage());
