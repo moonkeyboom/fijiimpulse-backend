@@ -74,7 +74,7 @@ public class OrderDetailController {
             @RequestParam int modelId,
             @RequestParam int quantity) {
         try {
-            String result = orderDetailService.adjustQuantityToWaitingOrder(userId, modelId, quantity);
+            String result = orderDetailService.addQuantityToWaitingOrder(userId, modelId, quantity);
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("ข้อผิดพลาด: " + e.getMessage());
