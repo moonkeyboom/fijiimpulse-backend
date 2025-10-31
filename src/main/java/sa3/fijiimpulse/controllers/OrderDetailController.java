@@ -2,20 +2,29 @@ package sa3.fijiimpulse.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sa3.fijiimpulse.entity.Order;
 import sa3.fijiimpulse.entity.OrderDetail;
+import sa3.fijiimpulse.entity.ProductModel;
 import sa3.fijiimpulse.service.OrderDetailService;
+import sa3.fijiimpulse.service.OrderService;
+import sa3.fijiimpulse.service.ProductItemService;
+import sa3.fijiimpulse.service.ProductModelService;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/order-details")
 public class OrderDetailController {
 
     private final OrderDetailService orderDetailService;
+    private final OrderService orderService;
+    private final ProductModelService productModelService;
 
-    public OrderDetailController(OrderDetailService orderDetailService) {
+    public OrderDetailController(OrderDetailService orderDetailService, OrderService orderService, ProductModelService productModelService) {
         this.orderDetailService = orderDetailService;
+        this.orderService = orderService;
+        this.productModelService = productModelService;
     }
 
     @GetMapping
@@ -36,6 +45,25 @@ public class OrderDetailController {
     @GetMapping("/order/{orderId}")
     public List<OrderDetail> getOrderDetailsByOrderId(@PathVariable Long orderId) {
         return orderDetailService.getOrderDetailsByOrderId(orderId);
+    }
+
+    @GetMapping("/order/not-paid/{userId}")
+    public Map<OrderDetail, String> getOrderDetailsInCart(@PathVariable int userId) {
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        long id = -1;
+        for (Order o : orders) {
+            if(o.getOrderStatus().equals("รอชำระเงิน")) {
+                id  = o.getOrderId();
+            }
+        }
+        List<OrderDetail> orderDetails = orderDetailService.getOrderDetailsByOrderId(id);
+        Map<OrderDetail, String> result = new LinkedHashMap<>();
+        for (OrderDetail detail : orderDetails) {
+            ProductModel model = productModelService.getProductById(detail.getModelId());
+            String modelName = model.getModelName();
+            result.put(detail, modelName);
+        }
+        return result;
     }
 
     /**

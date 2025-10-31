@@ -104,8 +104,8 @@ public class ProductItemController {
         return productItemService.getProductItemsByUserId(userId);
     }
 
-    @GetMapping("/items/{orderId}")
-    public List<Map<String, Object>> getProductItemsByOrderId(@PathVariable int orderId) {
-        return productItemService.getProductListFromOrderId(orderId);
-    }
+//    @GetMapping("/items/{orderId}")
+//    public List<Map<String, Object>> getProductItemsByOrderId(@PathVariable int orderId) {
+//        return productItemService.getProductListFromOrderId(orderId);
+//    }
 }
