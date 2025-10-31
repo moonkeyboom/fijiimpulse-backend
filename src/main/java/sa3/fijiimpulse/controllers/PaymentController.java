@@ -126,7 +126,7 @@ public class PaymentController {
 
     @GetMapping("/order/{orderId}/view")
     public ResponseEntity<byte[]> viewReceipt(@PathVariable long orderId) throws IOException {
-        Payment payment = paymentService.getPaymentByOrderId(orderId);
+        Payment payment = paymentService.getPaymentReceiptByOrderId(orderId);
         if (payment == null || payment.getPaymentReceipt() == null) return ResponseEntity.notFound().build();
 
         File imgFile = new File(payment.getPaymentReceipt());

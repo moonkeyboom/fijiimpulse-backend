@@ -101,4 +101,16 @@ public class PaymentDAO {
         });
     }
 
+    public Payment findReceiptByOrderId(long orderId) {
+        String sql = "SELECT Payment_receipt FROM PAYMENT WHERE Order_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{orderId}, rs -> {
+            if (rs.next()) {
+                Payment p = new Payment();
+                p.setPaymentReceipt(rs.getString("Payment_receipt"));
+                return p;
+            }
+            return null;
+        });
+    }
+
 }
