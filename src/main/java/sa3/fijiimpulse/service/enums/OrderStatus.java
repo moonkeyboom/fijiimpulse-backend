@@ -3,7 +3,6 @@ package sa3.fijiimpulse.service.enums;
 public enum OrderStatus {
  WAITING_PAYMENT("รอชำระเงิน"),
  WAITING_VERIFICATION("รอตรวจสอบหลักฐาน"),
- WAITING_RECHECK("รอตรวจสอบอีกครั้ง"),
  PAYMENT_REJECTED("หลักฐานการชำระเงินถูกปฏิเสธ"),
  PAYMENT_CONFIRMED("ยืนยันการชำระแล้ว"),
  PRODUCTION_COMPLETE("สินค้าผลิตแล้ว"),
